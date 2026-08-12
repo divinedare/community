@@ -683,6 +683,7 @@
       try { socials = JSON.parse(row['Socials'] || '[]'); } catch(e) {}
       return {
         name:     (row['Name'] || '').trim(),
+        nickname: (row['Nickname'] || '').trim(),
         email:    (row['Email'] || '').trim(),
         offer:    (row['What You Offer'] || '').trim(),
         websites: websites.filter(w => w.type || w.url).sort((a, b) => (a.type || '').localeCompare(b.type || '')),
@@ -782,6 +783,7 @@
 
       detailPanel.innerHTML = `
         <div class="detail-header">${escHtml(m.name)}</div>
+        ${m.nickname ? `<p style="padding:8px 24px 0; font-size:0.88rem; color:var(--muted); font-style:italic;">Known as ${escHtml(m.nickname)}</p>` : ''}
         <div class="detail-body">
           ${m.offer && m.offer !== 'Socials only' ? `<p class="detail-offer">${escHtml(m.offer)}</p>` : ''}
           ${(hasWebsites || hasSocials) ? `<div class="divider"></div>` : ''}
