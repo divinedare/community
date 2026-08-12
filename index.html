@@ -287,71 +287,137 @@
 
     .clear-filters.visible { display: inline; }
 
-    /* ── Grid ── */
-    .directory-grid {
+    /* ── Master-Detail Layout ── */
+    .directory-wrap {
       max-width: 1100px;
       margin: 0 auto;
       padding: 0 20px 60px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: 340px 1fr;
       gap: 20px;
+      align-items: start;
     }
 
-    /* ── Member Card ── */
-    .member-card {
+    /* ── Name List (left column) ── */
+    .name-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .name-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.97rem;
+      color: var(--gold);
+      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+      user-select: none;
+    }
+
+    .name-item::before {
+      content: '✦';
+      font-size: 0.6rem;
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+
+    .name-item .name-arrow {
+      margin-left: auto;
+      font-size: 0.7rem;
+      opacity: 0.5;
+      transition: opacity 0.15s ease;
+    }
+
+    .name-item:hover {
+      border-color: rgba(212,175,55,0.45);
+      background: rgba(212,175,55,0.06);
+    }
+
+    .name-item.active {
+      border-color: var(--gold);
+      background: linear-gradient(90deg, rgba(212,175,55,0.18), rgba(111,143,224,0.10));
+      box-shadow: 0 0 0 1px rgba(212,175,55,0.15), 0 8px 24px rgba(15,8,35,0.4);
+      color: var(--gold-light);
+    }
+
+    .name-item.active .name-arrow { opacity: 1; }
+
+    /* ── Detail Panel (right column) ── */
+    .detail-panel {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
+      position: sticky;
+      top: 20px;
+      min-height: 300px;
+      overflow: hidden;
+    }
+
+    .detail-placeholder {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 30px;
+      color: var(--muted);
+      height: 100%;
     }
 
-    .member-card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(212,175,55,0.4);
-      box-shadow: 0 20px 50px rgba(15,8,35,0.6), 0 0 0 1px rgba(212,175,55,0.15);
+    .detail-placeholder .icon {
+      font-size: 2rem;
+      color: var(--gold);
+      opacity: 0.3;
+      display: block;
+      margin-bottom: 14px;
     }
 
-    .card-name {
-      padding: 16px 20px;
+    .detail-placeholder p { font-size: 0.95rem; }
+
+    .detail-header {
+      padding: 20px 24px;
       border-bottom: 1px solid var(--border);
       background: linear-gradient(90deg, rgba(212,175,55,0.14), rgba(111,143,224,0.08));
       font-family: 'Cinzel', serif;
-      font-size: 1.05rem;
-      color: var(--gold);
+      font-size: 1.2rem;
+      color: var(--gold-light);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .card-name::before {
+    .detail-header::before {
       content: '✦';
       color: var(--gold);
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       opacity: 0.7;
-      flex-shrink: 0;
     }
 
-    .card-body-inner {
+    .detail-body {
+      padding: 22px 24px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
     }
 
-    .card-offer {
+    .detail-offer {
       color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.6;
-      flex: 1;
+      font-size: 0.95rem;
+      line-height: 1.7;
     }
 
     .card-links {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .links-label {
@@ -372,17 +438,15 @@
     .link-pill {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
       background: rgba(212,175,55,0.08);
       border: 1px solid rgba(212,175,55,0.22);
       border-radius: 999px;
-      padding: 5px 12px;
-      font-size: 0.82rem;
+      padding: 6px 14px;
+      font-size: 0.83rem;
       font-weight: 600;
       color: var(--gold-light);
       text-decoration: none;
       transition: background 0.12s ease, border-color 0.12s ease;
-      word-break: break-all;
     }
 
     .link-pill:hover {
@@ -404,7 +468,6 @@
     .divider {
       height: 1px;
       background: var(--border);
-      margin: 2px 0;
     }
 
     /* ── Empty / Loading states ── */
@@ -444,11 +507,11 @@
 
     /* ── Responsive ── */
     @media (max-width: 700px) {
-      .controls {
-        grid-template-columns: 1fr;
-      }
+      .controls { grid-template-columns: 1fr; }
       .filter-select { min-width: unset; }
       .site-header { padding: 36px 16px 28px; }
+      .directory-wrap { grid-template-columns: 1fr; }
+      .detail-panel { position: static; }
     }
     /* ── Celestial Background Canvas ── */
     #celestial-canvas {
@@ -460,7 +523,7 @@
     }
 
     /* Ensure content sits above canvas */
-    .site-header, .controls-wrap, .results-bar, .directory-grid, .site-footer {
+    .site-header, .controls-wrap, .results-bar, .directory-wrap, .site-footer {
       position: relative;
       z-index: 1;
     }
@@ -536,14 +599,22 @@
     <button class="clear-filters" id="clearFilters">Clear filters</button>
   </div>
 
-  <!-- ── Directory Grid ── -->
-  <main class="directory-grid" id="directoryGrid">
-    <div class="state-box">
-      <span class="state-icon">✦</span>
-      <h3>Loading the Spotlight...</h3>
-      <p>Connecting to the community directory.</p>
+  <!-- ── Master-Detail Layout ── -->
+  <div class="directory-wrap" id="directoryWrap">
+    <div class="name-list" id="nameList">
+      <div class="state-box">
+        <span class="state-icon">✦</span>
+        <h3>Loading the Spotlight...</h3>
+        <p>Connecting to the community directory.</p>
+      </div>
     </div>
-  </main>
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-placeholder">
+        <span class="icon">✦</span>
+        <p>Select a name on the left to view their listing.</p>
+      </div>
+    </div>
+  </div>
 
   <footer class="site-footer">
     The Divine Spotlight Community Directory &nbsp;✦&nbsp; A Divine Dare Studio
@@ -559,9 +630,15 @@
     const searchClear    = document.getElementById('searchClear');
     const websiteFilter  = document.getElementById('websiteFilter');
     const socialFilter   = document.getElementById('socialFilter');
-    const directoryGrid  = document.getElementById('directoryGrid');
-    const resultsCount   = document.getElementById('resultsCount');
-    const clearFilters   = document.getElementById('clearFilters');
+    const nameList     = document.getElementById('nameList');
+    const detailPanel  = document.getElementById('detailPanel');
+    const searchClear  = document.getElementById('searchClear');
+    const websiteFilter = document.getElementById('websiteFilter');
+    const socialFilter  = document.getElementById('socialFilter');
+    const resultsCount  = document.getElementById('resultsCount');
+    const clearFilters  = document.getElementById('clearFilters');
+
+    let activeIndex = null;
 
     // ── Fetch & parse sheet data ──
     async function loadDirectory() {
@@ -582,7 +659,7 @@
         buildFilters();
         renderCards(allMembers);
       } catch (err) {
-        directoryGrid.innerHTML = `
+        nameList.innerHTML = `
           <div class="state-box">
             <span class="state-icon">✦</span>
             <h3>Couldn't load the directory</h3>
@@ -615,23 +692,41 @@
       });
       Array.from(websiteTypes).sort().forEach(t => {
         const opt = document.createElement('option');
-        opt.value = t.toLowerCase();
-        opt.textContent = t;
+        opt.value = t.toLowerCase(); opt.textContent = t;
         websiteFilter.appendChild(opt);
       });
       Array.from(socialTypes).sort().forEach(t => {
         const opt = document.createElement('option');
-        opt.value = t.toLowerCase();
-        opt.textContent = t;
+        opt.value = t.toLowerCase(); opt.textContent = t;
         socialFilter.appendChild(opt);
       });
     }
 
-    // ── Render filtered cards ──
+    // ── Build social URL ──
+    function buildSocialUrl(s) {
+      const handle = s.handle || '';
+      const platform = (s.type || '').toLowerCase();
+      if (handle.startsWith('http')) return handle;
+      const slug = handle.replace('@','');
+      if (platform.includes('instagram'))  return `https://instagram.com/${slug}`;
+      if (platform.includes('tiktok'))     return `https://tiktok.com/@${slug}`;
+      if (platform.includes('facebook') && !platform.includes('group')) return `https://facebook.com/${slug}`;
+      if (platform.includes('pinterest'))  return `https://pinterest.com/${slug}`;
+      if (platform.includes('youtube'))    return `https://youtube.com/@${slug}`;
+      if (platform.includes('twitter') || platform.includes('x')) return `https://x.com/${slug}`;
+      if (platform.includes('threads'))    return `https://threads.net/@${slug}`;
+      if (platform.includes('linkedin'))   return `https://linkedin.com/in/${slug}`;
+      return '#';
+    }
+
+    // ── Render name list ──
     function renderCards(members) {
+      activeIndex = null;
+      detailPanel.innerHTML = `<div class="detail-placeholder"><span class="icon">✦</span><p>Select a name to view their listing.</p></div>`;
+
       if (members.length === 0) {
         resultsCount.innerHTML = '<strong>0</strong> members found';
-        directoryGrid.innerHTML = `
+        nameList.innerHTML = `
           <div class="state-box">
             <span class="state-icon">✦</span>
             <h3>No matches found</h3>
@@ -641,72 +736,66 @@
       }
 
       resultsCount.innerHTML = `<strong>${members.length}</strong> member${members.length !== 1 ? 's' : ''} in the spotlight`;
-      directoryGrid.innerHTML = members.map(buildCard).join('');
+      nameList.innerHTML = members.map((m, i) => `
+        <div class="name-item" data-index="${i}" onclick="selectMember(${i})">
+          ${escHtml(m.name)}
+          <span class="name-arrow">›</span>
+        </div>`).join('');
     }
 
-    function buildCard(m) {
+    // ── Show detail panel for selected member ──
+    window.selectMember = function(index) {
+      const filtered = getFiltered();
+      const m = filtered[index];
+      if (!m) return;
+
+      // Highlight selected name
+      document.querySelectorAll('.name-item').forEach(el => el.classList.remove('active'));
+      const activeEl = document.querySelector(`.name-item[data-index="${index}"]`);
+      if (activeEl) activeEl.classList.add('active');
+
       const websiteLinks = m.websites.map(w => {
         const url = w.url ? (w.url.startsWith('http') ? w.url : 'https://' + w.url) : '#';
-        return `<a class="link-pill" href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${w.type || 'Website'}</a>`;
+        return `<a class="link-pill" href="${url}" target="_blank" rel="noopener">${escHtml(w.type || 'Website')}</a>`;
       }).join('');
 
       const socialLinks = m.socials.map(s => {
-        let handle = s.handle || '';
-        const platform = (s.type || '').toLowerCase();
-
-        // Auto-add @ if it looks like a plain username (no @ and not a URL)
-        let displayHandle = handle;
-        if (handle && !handle.startsWith('http') && !handle.startsWith('@') && !handle.includes('.')) {
-          displayHandle = '@' + handle;
-        } else if (handle && !handle.startsWith('http') && !handle.startsWith('@')) {
-          displayHandle = handle;
-        }
-
-        // Build clickable URL
-        let url = handle;
-        if (!handle.startsWith('http')) {
-          const slug = handle.replace('@','');
-          if (platform.includes('instagram'))       url = `https://instagram.com/${slug}`;
-          else if (platform.includes('tiktok'))     url = `https://tiktok.com/@${slug}`;
-          else if (platform.includes('facebook') && !platform.includes('group')) url = `https://facebook.com/${slug}`;
-          else if (platform.includes('pinterest'))  url = `https://pinterest.com/${slug}`;
-          else if (platform.includes('youtube'))    url = `https://youtube.com/@${slug}`;
-          else if (platform.includes('twitter') || platform.includes('x')) url = `https://x.com/${slug}`;
-          else if (platform.includes('threads'))    url = `https://threads.net/@${slug}`;
-          else if (platform.includes('linkedin'))   url = `https://linkedin.com/in/${slug}`;
-          else url = handle.startsWith('http') ? handle : '#';
-        }
-
-        return `<a class="link-pill social" href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(s.type || 'Social')}</a>`;
+        const url = buildSocialUrl(s);
+        return `<a class="link-pill social" href="${url}" target="_blank" rel="noopener">${escHtml(s.type || 'Social')}</a>`;
       }).join('');
 
       const hasWebsites = websiteLinks.length > 0;
       const hasSocials  = socialLinks.length > 0;
 
-      return `
-        <article class="member-card" onclick="this.classList.toggle('open')">
-          <div class="card-name">
-            ${escHtml(m.name)}
-            <span class="toggle-icon">▼</span>
+      detailPanel.innerHTML = `
+        <div class="detail-header">${escHtml(m.name)}</div>
+        <div class="detail-body">
+          ${m.offer ? `<p class="detail-offer">${escHtml(m.offer)}</p>` : ''}
+          ${(hasWebsites || hasSocials) ? `<div class="divider"></div>` : ''}
+          <div class="card-links">
+            ${hasWebsites ? `<span class="links-label">Websites</span><div class="link-pills">${websiteLinks}</div>` : ''}
+            ${hasSocials  ? `<span class="links-label" style="margin-top:${hasWebsites ? '8px' : '0'}">Socials</span><div class="link-pills">${socialLinks}</div>` : ''}
           </div>
-          <div class="card-body">
-            <div class="card-body-inner">
-              ${m.offer ? `<p class="card-offer">${escHtml(m.offer)}</p>` : ''}
-              ${hasWebsites || hasSocials ? `<div class="divider"></div>` : ''}
-              <div class="card-links">
-                ${hasWebsites ? `<span class="links-label">Websites</span><div class="link-pills">${websiteLinks}</div>` : ''}
-                ${hasSocials  ? `<span class="links-label" style="margin-top:${hasWebsites ? '6px' : '0'}">Socials</span><div class="link-pills">${socialLinks}</div>` : ''}
-              </div>
-            </div>
-          </div>
-        </article>`;
-    }
+        </div>`;
+    };
 
     function escHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     // ── Live filter logic ──
+    function getFiltered() {
+      const query   = searchInput.value.toLowerCase().trim();
+      const website = websiteFilter.value.toLowerCase();
+      const social  = socialFilter.value.toLowerCase();
+      return allMembers.filter(m => {
+        const matchName    = !query   || `${m.name} ${m.offer}`.toLowerCase().includes(query);
+        const matchWebsite = !website || m.websites.some(w => (w.type || '').toLowerCase().includes(website));
+        const matchSocial  = !social  || m.socials.some(s => (s.type || '').toLowerCase().includes(social));
+        return matchName && matchWebsite && matchSocial;
+      });
+    }
+
     function applyFilters() {
       const query   = searchInput.value.toLowerCase().trim();
       const website = websiteFilter.value.toLowerCase();
@@ -716,14 +805,7 @@
       searchClear.classList.toggle('visible', !!query);
       clearFilters.classList.toggle('visible', hasFilter);
 
-      const filtered = allMembers.filter(m => {
-        const matchName    = !query   || `${m.name} ${m.offer}`.toLowerCase().includes(query);
-        const matchWebsite = !website || m.websites.some(w => (w.type || '').toLowerCase().includes(website));
-        const matchSocial  = !social  || m.socials.some(s => (s.type || '').toLowerCase().includes(social));
-        return matchName && matchWebsite && matchSocial;
-      });
-
-      renderCards(filtered);
+      renderCards(getFiltered());
     }
 
     searchInput.addEventListener('input', applyFilters);
