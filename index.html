@@ -182,7 +182,7 @@
       border-radius: var(--radius);
       padding: 20px 22px;
       display: grid;
-      grid-template-columns: 1fr auto auto;
+      grid-template-columns: 1fr auto auto auto;
       gap: 14px;
       align-items: center;
       box-shadow: var(--shadow);
@@ -584,6 +584,16 @@
         />
         <button class="search-clear" id="searchClear" type="button" title="Clear search">✕</button>
       </div>
+      <select class="filter-select" id="letterFilter" style="min-width:120px;">
+        <option value="">A – Z</option>
+        <option>A</option><option>B</option><option>C</option><option>D</option>
+        <option>E</option><option>F</option><option>G</option><option>H</option>
+        <option>I</option><option>J</option><option>K</option><option>L</option>
+        <option>M</option><option>N</option><option>O</option><option>P</option>
+        <option>Q</option><option>R</option><option>S</option><option>T</option>
+        <option>U</option><option>V</option><option>W</option><option>X</option>
+        <option>Y</option><option>Z</option>
+      </select>
       <select class="filter-select" id="websiteFilter">
         <option value="">All Websites</option>
       </select>
@@ -634,6 +644,7 @@
     const detailPanel    = document.getElementById('detailPanel');
     const resultsCount   = document.getElementById('resultsCount');
     const clearFilters   = document.getElementById('clearFilters');
+    const letterFilter   = document.getElementById('letterFilter');
 
     let activeIndex = null;
 
@@ -772,7 +783,7 @@
       detailPanel.innerHTML = `
         <div class="detail-header">${escHtml(m.name)}</div>
         <div class="detail-body">
-          ${m.offer ? `<p class="detail-offer">${escHtml(m.offer)}</p>` : ''}
+          ${m.offer && m.offer !== 'Socials only' ? `<p class="detail-offer">${escHtml(m.offer)}</p>` : ''}
           ${(hasWebsites || hasSocials) ? `<div class="divider"></div>` : ''}
           <div class="card-links">
             ${hasWebsites ? `<span class="links-label">Websites</span><div class="link-pills">${websiteLinks}</div>` : ''}
@@ -790,11 +801,13 @@
       const query   = searchInput.value.toLowerCase().trim();
       const website = websiteFilter.value.toLowerCase();
       const social  = socialFilter.value.toLowerCase();
+      const letter  = letterFilter.value.toUpperCase();
       return allMembers.filter(m => {
         const matchName    = !query   || `${m.name} ${m.offer}`.toLowerCase().includes(query);
         const matchWebsite = !website || m.websites.some(w => (w.type || '').toLowerCase().includes(website));
         const matchSocial  = !social  || m.socials.some(s => (s.type || '').toLowerCase().includes(social));
-        return matchName && matchWebsite && matchSocial;
+        const matchLetter  = !letter  || m.name.split(/\s+/).some(word => word.toUpperCase().startsWith(letter));
+        return matchName && matchWebsite && matchSocial && matchLetter;
       });
     }
 
@@ -802,7 +815,8 @@
       const query   = searchInput.value.toLowerCase().trim();
       const website = websiteFilter.value.toLowerCase();
       const social  = socialFilter.value.toLowerCase();
-      const hasFilter = query || website || social;
+      const letter  = letterFilter.value;
+      const hasFilter = query || website || social || letter;
 
       searchClear.classList.toggle('visible', !!query);
       clearFilters.classList.toggle('visible', hasFilter);
@@ -811,6 +825,7 @@
     }
 
     searchInput.addEventListener('input', applyFilters);
+    letterFilter.addEventListener('change', applyFilters);
     websiteFilter.addEventListener('change', applyFilters);
     socialFilter.addEventListener('change', applyFilters);
 
@@ -823,6 +838,7 @@
 
     clearFilters.addEventListener('click', () => {
       searchInput.value = '';
+      letterFilter.value = '';
       websiteFilter.value = '';
       socialFilter.value = '';
       searchClear.classList.remove('visible');

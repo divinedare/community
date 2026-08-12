@@ -430,6 +430,10 @@
             <input id="name" name="name" type="text" placeholder="First name, Last name" required />
           </div>
           <div>
+            <label for="nickname">Nickname / Known By</label>
+            <input id="nickname" name="nickname" type="text" placeholder="What do people call you? (optional)" />
+          </div>
+          <div>
             <label for="email">Email *</label>
             <input id="email" name="email" type="email" placeholder="yourname@email.com" required />
           </div>
@@ -462,6 +466,7 @@
                   <option>Gumroad</option>
                   <option>Payhip</option>
                   <option>Shopify</option>
+                  <option>Skool</option>
                   <option>Stan Store</option>
                   <option>Other</option>
                 </select>
@@ -576,6 +581,7 @@
       <option>Gumroad</option>
       <option>Payhip</option>
       <option>Shopify</option>
+      <option>Skool</option>
       <option>Stan Store</option>
       <option>Other</option>`;
 
@@ -866,7 +872,8 @@
       }
 
       const data = {
-        name: nameInput.value.trim(),
+        name:         nameInput.value.trim(),
+        nickname:     document.getElementById('nickname').value.trim(),
         email: emailInput.value.trim(),
         whatYouOffer: offerInput.value.trim(),
         websites: Array.from(document.querySelectorAll('.website-row')).map(row => ({
