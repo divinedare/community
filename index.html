@@ -829,7 +829,7 @@
       const social  = socialFilter.value.toLowerCase();
       const letter  = letterFilter.value.toUpperCase();
       return allMembers.filter(m => {
-        const matchName    = !query   || `${m.name} ${m.offer}`.toLowerCase().includes(query);
+        const matchName    = !query   || `${m.name} ${m.nickname} ${m.offer}`.toLowerCase().includes(query);
         const matchWebsite = !website || m.websites.some(w => (w.type || '').toLowerCase().includes(website));
         const matchSocial  = !social  || m.socials.some(s => (s.type || '').toLowerCase().includes(social));
         const matchLetter  = !letter  || m.name.split(/\s+/).some(word => word.toUpperCase().startsWith(letter));
