@@ -114,6 +114,61 @@
 
     .header-cta:hover { transform: translateY(-2px); }
 
+    .header-cta-outline {
+      display: inline-block;
+      margin-top: 20px;
+      background: transparent;
+      color: var(--gold-light);
+      font-weight: 700;
+      font-family: 'Montserrat', sans-serif;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 12px 28px;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+
+    .header-cta-outline:hover { transform: translateY(-2px); border-color: var(--gold); }
+
+    .header-btns {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Card expand/collapse */
+    .card-body {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 20px;
+    }
+
+    .member-card.open .card-body {
+      max-height: 600px;
+      padding: 18px 20px;
+    }
+
+    .card-name {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .card-name .toggle-icon {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--gold);
+      opacity: 0.7;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .member-card.open .card-name .toggle-icon {
+      transform: rotate(180deg);
+    }
+
     /* ── Controls ── */
     .controls-wrap {
       max-width: 1100px;
@@ -280,12 +335,10 @@
       flex-shrink: 0;
     }
 
-    .card-body {
-      padding: 18px 20px;
+    .card-body-inner {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      flex: 1;
     }
 
     .card-offer {
@@ -448,7 +501,10 @@
     <h1>The Divine Spotlight</h1>
     <div class="star-divider">✦ &nbsp; ✦ &nbsp; ✦</div>
     <p>Browse our community of creators, makers, and entrepreneurs. Find someone who offers what you need — then follow, support, and cheer them on.</p>
-    <a href="https://divinedare.github.io/community/submit.html" class="header-cta">+ Add Your Listing</a>
+    <div class="header-btns">
+      <a href="https://divinedare.github.io/community/submit.html" class="header-cta">+ Add Your Listing</a>
+      <a href="https://divinedare.github.io/community/manage.html" class="header-cta-outline">Manage My Listing</a>
+    </div>
   </header>
 
   <!-- ── Search & Filter Controls ── -->
@@ -591,7 +647,7 @@
     function buildCard(m) {
       const websiteLinks = m.websites.map(w => {
         const url = w.url ? (w.url.startsWith('http') ? w.url : 'https://' + w.url) : '#';
-        return `<a class="link-pill" href="${url}" target="_blank" rel="noopener">${w.type || 'Website'}</a>`;
+        return `<a class="link-pill" href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${w.type || 'Website'}</a>`;
       }).join('');
 
       const socialLinks = m.socials.map(s => {
@@ -621,21 +677,26 @@
           else url = handle.startsWith('http') ? handle : '#';
         }
 
-        return `<a class="link-pill social" href="${url}" target="_blank" rel="noopener">${escHtml(s.type || 'Social')}</a>`;
+        return `<a class="link-pill social" href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(s.type || 'Social')}</a>`;
       }).join('');
 
       const hasWebsites = websiteLinks.length > 0;
       const hasSocials  = socialLinks.length > 0;
 
       return `
-        <article class="member-card">
-          <div class="card-name">${escHtml(m.name)}</div>
+        <article class="member-card" onclick="this.classList.toggle('open')">
+          <div class="card-name">
+            ${escHtml(m.name)}
+            <span class="toggle-icon">▼</span>
+          </div>
           <div class="card-body">
-            ${m.offer ? `<p class="card-offer">${escHtml(m.offer)}</p>` : ''}
-            ${hasWebsites || hasSocials ? `<div class="divider"></div>` : ''}
-            <div class="card-links">
-              ${hasWebsites ? `<span class="links-label">Websites</span><div class="link-pills">${websiteLinks}</div>` : ''}
-              ${hasSocials  ? `<span class="links-label" style="margin-top:${hasWebsites ? '6px' : '0'}">Socials</span><div class="link-pills">${socialLinks}</div>` : ''}
+            <div class="card-body-inner">
+              ${m.offer ? `<p class="card-offer">${escHtml(m.offer)}</p>` : ''}
+              ${hasWebsites || hasSocials ? `<div class="divider"></div>` : ''}
+              <div class="card-links">
+                ${hasWebsites ? `<span class="links-label">Websites</span><div class="link-pills">${websiteLinks}</div>` : ''}
+                ${hasSocials  ? `<span class="links-label" style="margin-top:${hasWebsites ? '6px' : '0'}">Socials</span><div class="link-pills">${socialLinks}</div>` : ''}
+              </div>
             </div>
           </div>
         </article>`;
