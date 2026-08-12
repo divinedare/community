@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Divine Spotlight | Community Directory</title>
+  <title>The Divine Purple Pages | Community Directory</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -561,7 +561,7 @@
   <!-- ── Header ── -->
   <header class="site-header">
     <p class="eyebrow">A Divine Dare Studio</p>
-    <h1>The Divine Spotlight</h1>
+    <h1>The Divine Purple Pages</h1>
     <div class="star-divider">✦ &nbsp; ✦ &nbsp; ✦</div>
     <p>Browse our community of creators, makers, and entrepreneurs. Find someone who offers what you need — then follow, support, and cheer them on.</p>
     <div class="header-btns">
@@ -617,7 +617,7 @@
   </div>
 
   <footer class="site-footer">
-    The Divine Spotlight Community Directory &nbsp;✦&nbsp; A Divine Dare Studio
+    The Divine Purple Pages Community Directory &nbsp;✦&nbsp; A Divine Dare Studio
   </footer>
 
   <script>
@@ -701,13 +701,18 @@
 
     // ── Build social URL ──
     function buildSocialUrl(s) {
-      const handle = s.handle || '';
+      const handle = (s.handle || '').trim();
+      if (!handle) return '#';
+      // If it's already a full URL, use it directly
+      if (handle.startsWith('http') || handle.startsWith('www.')) {
+        return handle.startsWith('www.') ? 'https://' + handle : handle;
+      }
+      // Fallback for old entries that only have a handle/username
       const platform = (s.type || '').toLowerCase();
-      if (handle.startsWith('http')) return handle;
       const slug = handle.replace('@','');
       if (platform.includes('instagram'))  return `https://instagram.com/${slug}`;
       if (platform.includes('tiktok'))     return `https://tiktok.com/@${slug}`;
-      if (platform.includes('facebook') && !platform.includes('group')) return `https://facebook.com/${slug}`;
+      if (platform.includes('facebook'))   return `https://facebook.com/${slug}`;
       if (platform.includes('pinterest'))  return `https://pinterest.com/${slug}`;
       if (platform.includes('youtube'))    return `https://youtube.com/@${slug}`;
       if (platform.includes('twitter') || platform.includes('x')) return `https://x.com/${slug}`;

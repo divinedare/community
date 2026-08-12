@@ -506,8 +506,8 @@
                 </select>
               </div>
               <div>
-                <label>Handle or URL</label>
-                <input type="text" name="socialHandle[]" placeholder="@yourhandle or www.example.com/@yourhandle" />
+                <label>Profile URL</label>
+                <input type="text" name="socialHandle[]" placeholder="https://www.instagram.com/yourhandle" />
               </div>
               <div>
                 <button class="remove-btn remove-social" type="button" style="display:none;">Remove</button>
@@ -621,8 +621,8 @@
           <select name="socialType[]">${SOCIAL_OPTIONS}</select>
         </div>
         <div>
-          <label>Handle or URL</label>
-          <input type="text" name="socialHandle[]" placeholder="@yourhandle or www.example.com/@yourhandle" />
+          <label>Profile URL</label>
+          <input type="text" name="socialHandle[]" placeholder="https://www.instagram.com/yourhandle" />
         </div>
         <div>
           <button class="remove-btn remove-social" type="button">Remove</button>
@@ -668,6 +668,17 @@
 
     addWebsiteBtn.addEventListener('click', () => websiteRows.appendChild(createWebsiteRow()));
     addSocialBtn.addEventListener('click', () => socialRows.appendChild(createSocialRow()));
+
+    // Validate social URL on blur — must be full URL
+    socialRows.addEventListener('blur', (e) => {
+      if (e.target.name === 'socialHandle[]') validateUrl(e.target);
+    }, true);
+
+    socialRows.addEventListener('input', (e) => {
+      if (e.target.name === 'socialHandle[]' && e.target.classList.contains('field-error')) {
+        if (/^(https?:\/\/|www\.)/i.test(e.target.value.trim())) clearUrlError(e.target);
+      }
+    });
 
     websiteRows.addEventListener('click', (e) => {
       if (!e.target.classList.contains('remove-website')) return;
@@ -751,8 +762,8 @@
             <select name="socialType[]">${SOCIAL_OPTIONS}</select>
           </div>
           <div>
-            <label>Handle or URL</label>
-            <input type="text" name="socialHandle[]" placeholder="@yourhandle or www.example.com/@yourhandle" />
+            <label>Profile URL</label>
+            <input type="text" name="socialHandle[]" placeholder="https://www.instagram.com/yourhandle" />
           </div>
           <div>
             <button class="remove-btn remove-social" type="button" style="display:none;">Remove</button>
