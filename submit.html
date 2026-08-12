@@ -486,6 +486,7 @@
                   <option value="">Select one</option>
                   <option>Instagram</option>
                   <option>TikTok</option>
+                  <option>Facebook Page</option>
                   <option>Facebook</option>
                   <option>Facebook Group</option>
                   <option>Pinterest</option>
@@ -530,7 +531,7 @@
   </div>
 
   <script>
-    const FORM_ENDPOINT_URL = 'FORM_ENDPOINT_URL';
+    const FORM_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbzsrj3BD3hPgpK6rD1Sfz_kbJObwoFN_MQAGtb5APBlBVdeFEbqPHqJcik0VJfDZVRI/exec';
 
     const form = document.getElementById('simpleForm');
     const successMessage = document.getElementById('successMessage');
@@ -557,6 +558,7 @@
       <option value="">Select one</option>
       <option>Instagram</option>
       <option>TikTok</option>
+      <option>Facebook Page</option>
       <option>Facebook</option>
       <option>Facebook Group</option>
       <option>Pinterest</option>
@@ -732,6 +734,13 @@
           </div>
         </div>`;
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Prevent Enter key from submitting (textareas still work normally)
+    form.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+      }
     });
 
     form.addEventListener('submit', async (e) => {
