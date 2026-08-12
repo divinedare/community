@@ -367,6 +367,13 @@
       50% { opacity: var(--peak, 0.07); transform: scale(1); }
     }
 
+    /* White background when input is filled */
+    input[type="text"]:not(:placeholder-shown),
+    input[type="email"]:not(:placeholder-shown) {
+      background: #ffffff;
+      color: #1a1530;
+    }
+
     /* URL validation error message */
     .url-error {
       color: #e05a6e;
@@ -449,13 +456,13 @@
                 <select name="websiteType[]">
                   <option value="">Select one</option>
                   <option>Website</option>
-                  <option>Shopify</option>
-                  <option>Etsy</option>
-                  <option>Stan Store</option>
+                  <option>Amazon Storefront</option>
                   <option>Beacons</option>
+                  <option>Etsy</option>
                   <option>Gumroad</option>
                   <option>Payhip</option>
-                  <option>Amazon Storefront</option>
+                  <option>Shopify</option>
+                  <option>Stan Store</option>
                   <option>Other</option>
                 </select>
               </div>
@@ -484,17 +491,17 @@
                 <label>Platform</label>
                 <select name="socialType[]">
                   <option value="">Select one</option>
-                  <option>Instagram</option>
-                  <option>TikTok</option>
-                  <option>Facebook Page</option>
                   <option>Facebook</option>
                   <option>Facebook Group</option>
-                  <option>Pinterest</option>
-                  <option>YouTube</option>
-                  <option>Twitter / X</option>
-                  <option>Threads</option>
+                  <option>Facebook Page</option>
+                  <option>Instagram</option>
                   <option>LinkedIn</option>
+                  <option>Pinterest</option>
                   <option>Snapchat</option>
+                  <option>Threads</option>
+                  <option>TikTok</option>
+                  <option>Twitter / X</option>
+                  <option>YouTube</option>
                   <option>Other</option>
                 </select>
               </div>
@@ -531,7 +538,25 @@
   </div>
 
   <script>
-    const FORM_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbzsrj3BD3hPgpK6rD1Sfz_kbJObwoFN_MQAGtb5APBlBVdeFEbqPHqJcik0VJfDZVRI/exec';
+    const FORM_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbwbjuYTVuQKKTzswCWbWUVRP3A0R8LRKnmbrNYM_FeOpbgDzp8HiEQE0CVu3C_aBR6G/exec';
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRPvBB_TCJKPMy8ryaTf856sHV16JexUT4ENdlup1pXWHLUKqmR2YI069d4l96e4rYCEb55uMSVtGxH/pub?gid=0&single=true&output=csv';
+
+    async function checkForDuplicate(name, email) {
+      try {
+        const res = await fetch(SHEET_CSV_URL);
+        const text = await res.text();
+        const lines = text.split('\n').slice(1); // skip header row
+        for (const line of lines) {
+          // Simple check: does any row contain this exact name or email
+          const lower = line.toLowerCase();
+          if (email && lower.includes(email.toLowerCase())) return 'email';
+          if (name && lower.includes('"' + name.toLowerCase() + '"')) return 'name';
+        }
+        return null;
+      } catch(e) {
+        return null; // if check fails, let them through
+      }
+    }
 
     const form = document.getElementById('simpleForm');
     const successMessage = document.getElementById('successMessage');
@@ -545,28 +570,28 @@
     const WEBSITE_OPTIONS = `
       <option value="">Select one</option>
       <option>Website</option>
-      <option>Shopify</option>
-      <option>Etsy</option>
-      <option>Stan Store</option>
+      <option>Amazon Storefront</option>
       <option>Beacons</option>
+      <option>Etsy</option>
       <option>Gumroad</option>
       <option>Payhip</option>
-      <option>Amazon Storefront</option>
+      <option>Shopify</option>
+      <option>Stan Store</option>
       <option>Other</option>`;
 
     const SOCIAL_OPTIONS = `
       <option value="">Select one</option>
-      <option>Instagram</option>
-      <option>TikTok</option>
-      <option>Facebook Page</option>
       <option>Facebook</option>
       <option>Facebook Group</option>
-      <option>Pinterest</option>
-      <option>YouTube</option>
-      <option>Twitter / X</option>
-      <option>Threads</option>
+      <option>Facebook Page</option>
+      <option>Instagram</option>
       <option>LinkedIn</option>
+      <option>Pinterest</option>
       <option>Snapchat</option>
+      <option>Threads</option>
+      <option>TikTok</option>
+      <option>Twitter / X</option>
+      <option>YouTube</option>
       <option>Other</option>`;
 
     function createWebsiteRow() {
@@ -736,6 +761,12 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    form.addEventListener('change', (e) => {
+      if (e.target.tagName === 'SELECT' && e.target.value) {
+        e.target.classList.remove('field-error');
+      }
+    });
+
     // Prevent Enter key from submitting (textareas still work normally)
     form.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
@@ -777,10 +808,19 @@
       document.querySelectorAll('.website-row').forEach(row => {
         const typeSelect = row.querySelector('select');
         const urlInput = row.querySelector('input');
-        if (typeSelect && urlInput && typeSelect.value && !urlInput.value.trim()) {
+        const hasType = typeSelect && typeSelect.value;
+        const hasUrl = urlInput && urlInput.value.trim();
+        if (hasType && !hasUrl) {
           urlInput.classList.add('field-error');
-          if (!missingFields.includes('Website URL (you picked a type but left the link blank)')) {
-            missingFields.push('Website URL (you picked a type but left the link blank)');
+          if (!missingFields.includes('Website URL — you selected a type but left the link blank')) {
+            missingFields.push('Website URL — you selected a type but left the link blank');
+          }
+          validationFailed = true;
+        }
+        if (hasUrl && !hasType) {
+          typeSelect.classList.add('field-error');
+          if (!missingFields.includes('Website Type — you entered a link but didn\'t select a type')) {
+            missingFields.push('Website Type — you entered a link but didn\'t select a type');
           }
           validationFailed = true;
         }
@@ -789,10 +829,19 @@
       document.querySelectorAll('.social-row').forEach(row => {
         const typeSelect = row.querySelector('select');
         const handleInput = row.querySelector('input');
-        if (typeSelect && handleInput && typeSelect.value && !handleInput.value.trim()) {
+        const hasType = typeSelect && typeSelect.value;
+        const hasHandle = handleInput && handleInput.value.trim();
+        if (hasType && !hasHandle) {
           handleInput.classList.add('field-error');
-          if (!missingFields.includes('Social handle/URL (you picked a platform but left it blank)')) {
-            missingFields.push('Social handle/URL (you picked a platform but left it blank)');
+          if (!missingFields.includes('Social handle/URL — you selected a platform but left it blank')) {
+            missingFields.push('Social handle/URL — you selected a platform but left it blank');
+          }
+          validationFailed = true;
+        }
+        if (hasHandle && !hasType) {
+          typeSelect.classList.add('field-error');
+          if (!missingFields.includes('Social Platform — you entered a handle but didn\'t select a platform')) {
+            missingFields.push('Social Platform — you entered a handle but didn\'t select a platform');
           }
           validationFailed = true;
         }
@@ -824,6 +873,20 @@
         formWrap.style.display = 'none';
         successPage.style.display = 'flex';
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // Check for duplicate before submitting
+      errorMessage.innerHTML = 'Checking for existing listings...';
+      errorMessage.style.display = 'block';
+      const duplicate = await checkForDuplicate(data.name, data.email);
+      errorMessage.style.display = 'none';
+
+      if (duplicate) {
+        const field = duplicate === 'email' ? 'email address' : 'name';
+        errorMessage.innerHTML = `<strong>Looks like you're already in the spotlight! ✦</strong><br>A listing with this ${field} already exists. If you need to update or add to your listing, please use the <a href="manage.html" style="color:var(--gold-light);text-decoration:underline;">Manage My Listing</a> page.`;
+        errorMessage.style.display = 'block';
+        errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
 

@@ -521,7 +521,8 @@
         allMembers = parsed.data
           .filter(row => row['Name'] && row['Name'].trim())
           .filter(row => row['Directory Permission'] !== 'No')
-          .map(parseRow);
+          .map(parseRow)
+          .sort((a, b) => a.name.localeCompare(b.name));
         buildFilters();
         renderCards(allMembers);
       } catch (err) {
@@ -543,8 +544,8 @@
         name:     (row['Name'] || '').trim(),
         email:    (row['Email'] || '').trim(),
         offer:    (row['What You Offer'] || '').trim(),
-        websites: websites.filter(w => w.type || w.url),
-        socials:  socials.filter(s => s.type || s.handle)
+        websites: websites.filter(w => w.type || w.url).sort((a, b) => (a.type || '').localeCompare(b.type || '')),
+        socials:  socials.filter(s => s.type || s.handle).sort((a, b) => (a.type || '').localeCompare(b.type || ''))
       };
     }
 
@@ -620,11 +621,7 @@
           else url = handle.startsWith('http') ? handle : '#';
         }
 
-        const label = displayHandle
-          ? `${s.type || 'Social'} ${escHtml(displayHandle)}`
-          : (s.type || 'Social');
-
-        return `<a class="link-pill social" href="${url}" target="_blank" rel="noopener">${label}</a>`;
+        return `<a class="link-pill social" href="${url}" target="_blank" rel="noopener">${escHtml(s.type || 'Social')}</a>`;
       }).join('');
 
       const hasWebsites = websiteLinks.length > 0;
