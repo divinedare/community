@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
     :root {
@@ -182,7 +183,7 @@
       border-radius: var(--radius);
       padding: 20px 22px;
       display: grid;
-      grid-template-columns: 1fr auto auto auto;
+      grid-template-columns: 1fr auto;
       gap: 14px;
       align-items: center;
       box-shadow: var(--shadow);
@@ -616,12 +617,6 @@
         <option>U</option><option>V</option><option>W</option><option>X</option>
         <option>Y</option><option>Z</option>
       </select>
-      <select class="filter-select" id="websiteFilter">
-        <option value="">All Websites</option>
-      </select>
-      <select class="filter-select" id="socialFilter">
-        <option value="">All Socials</option>
-      </select>
     </div>
   </div>
 
@@ -660,8 +655,6 @@
 
     const searchInput    = document.getElementById('searchInput');
     const searchClear    = document.getElementById('searchClear');
-    const websiteFilter  = document.getElementById('websiteFilter');
-    const socialFilter   = document.getElementById('socialFilter');
     const nameList       = document.getElementById('nameList');
     const detailPanel    = document.getElementById('detailPanel');
     const resultsCount   = document.getElementById('resultsCount');
@@ -686,7 +679,6 @@
           .filter(row => row['Directory Permission'] !== 'No')
           .map(parseRow)
           .sort((a, b) => a.name.localeCompare(b.name));
-        buildFilters();
         renderCards(allMembers);
       } catch (err) {
         nameList.innerHTML = `
@@ -711,26 +703,6 @@
         websites: websites.filter(w => w.type || w.url).sort((a, b) => (a.type || '').localeCompare(b.type || '')),
         socials:  socials.filter(s => s.type || s.handle).sort((a, b) => (a.type || '').localeCompare(b.type || ''))
       };
-    }
-
-    // ── Build both filter dropdowns from real data ──
-    function buildFilters() {
-      const websiteTypes = new Set();
-      const socialTypes  = new Set();
-      allMembers.forEach(m => {
-        m.websites.forEach(w => { if (w.type) websiteTypes.add(w.type); });
-        m.socials.forEach(s => { if (s.type) socialTypes.add(s.type); });
-      });
-      Array.from(websiteTypes).sort().forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.toLowerCase(); opt.textContent = t;
-        websiteFilter.appendChild(opt);
-      });
-      Array.from(socialTypes).sort().forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.toLowerCase(); opt.textContent = t;
-        socialFilter.appendChild(opt);
-      });
     }
 
     // ── Build social URL ──
@@ -780,28 +752,47 @@
     }
 
     // ── Show detail panel for selected member ──
+    // ── Social icon map (Font Awesome 6 brand icons) ──
+    const socialIconMap = {
+      'instagram':     'fa-brands fa-instagram',
+      'tiktok':        'fa-brands fa-tiktok',
+      'facebook':      'fa-brands fa-facebook',
+      'facebook page': 'fa-brands fa-facebook',
+      'facebook group':'fa-brands fa-facebook-f',
+      'pinterest':     'fa-brands fa-pinterest',
+      'youtube':       'fa-brands fa-youtube',
+      'twitter / x':   'fa-brands fa-x-twitter',
+      'threads':       'fa-brands fa-threads',
+      'linkedin':      'fa-brands fa-linkedin',
+      'snapchat':      'fa-brands fa-snapchat',
+    };
+
     window.selectMember = function(index) {
       const filtered = getFiltered();
       const m = filtered[index];
       if (!m) return;
 
-      // Highlight selected name
       document.querySelectorAll('.name-item').forEach(el => el.classList.remove('active'));
       const activeEl = document.querySelector(`.name-item[data-index="${index}"]`);
       if (activeEl) activeEl.classList.add('active');
 
+      // Website pills — globe icon + type label
       const websiteLinks = m.websites.map(w => {
         const url = w.url ? (w.url.startsWith('http') ? w.url : 'https://' + w.url) : '#';
-        return `<a class="link-pill" href="${url}" target="_blank" rel="noopener">${escHtml(w.type || 'Website')}</a>`;
+        return `<a class="link-pill" href="${url}" target="_blank" rel="noopener"><i class="fa-solid fa-globe" style="font-size:0.75rem;"></i> ${escHtml(w.type || 'Website')}</a>`;
       }).join('');
 
+      // Social pills — brand icon + type label (text only for Other)
       const socialLinks = m.socials.map(s => {
         const url = buildSocialUrl(s);
-        return `<a class="link-pill social" href="${url}" target="_blank" rel="noopener">${escHtml(s.type || 'Social')}</a>`;
+        const iconClass = socialIconMap[(s.type || '').toLowerCase()];
+        const iconHtml = iconClass ? `<i class="${iconClass}" style="font-size:0.85rem;"></i> ` : '';
+        return `<a class="link-pill social" href="${url}" target="_blank" rel="noopener">${iconHtml}${escHtml(s.type || 'Social')}</a>`;
       }).join('');
 
-      const hasWebsites = websiteLinks.length > 0;
-      const hasSocials  = socialLinks.length > 0;
+      const allLinks = websiteLinks + socialLinks;
+      const hasLinks = allLinks.length > 0;
+      const hasOffer = m.offer && m.offer !== 'Socials only';
 
       detailPanel.innerHTML = `
         <div class="detail-header">
@@ -809,12 +800,13 @@
           ${m.nickname ? `<span class="detail-known-as">Known as ${escHtml(m.nickname)}</span>` : ''}
         </div>
         <div class="detail-body">
-          ${m.offer && m.offer !== 'Socials only' ? `<p class="detail-offer">${escHtml(m.offer)}</p>` : ''}
-          ${(hasWebsites || hasSocials) ? `<div class="divider"></div>` : ''}
-          <div class="card-links">
-            ${hasWebsites ? `<span class="links-label">Websites</span><div class="link-pills">${websiteLinks}</div>` : ''}
-            ${hasSocials  ? `<span class="links-label" style="margin-top:${hasWebsites ? '8px' : '0'}">Socials</span><div class="link-pills">${socialLinks}</div>` : ''}
-          </div>
+          ${hasOffer ? `<p class="detail-offer">${escHtml(m.offer)}</p>` : ''}
+          ${hasLinks ? `
+            ${hasOffer ? '<div class="divider"></div>' : ''}
+            <div class="card-links">
+              <span class="links-label">Let's Connect</span>
+              <div class="link-pills">${allLinks}</div>
+            </div>` : ''}
         </div>`;
     };
 
@@ -824,36 +816,26 @@
 
     // ── Live filter logic ──
     function getFiltered() {
-      const query   = searchInput.value.toLowerCase().trim();
-      const website = websiteFilter.value.toLowerCase();
-      const social  = socialFilter.value.toLowerCase();
-      const letter  = letterFilter.value.toUpperCase();
+      const query  = searchInput.value.toLowerCase().trim();
+      const letter = letterFilter.value.toUpperCase();
       return allMembers.filter(m => {
-        const matchName    = !query   || `${m.name} ${m.nickname} ${m.offer}`.toLowerCase().includes(query);
-        const matchWebsite = !website || m.websites.some(w => (w.type || '').toLowerCase().includes(website));
-        const matchSocial  = !social  || m.socials.some(s => (s.type || '').toLowerCase().includes(social));
-        const matchLetter  = !letter  || m.name.split(/\s+/).some(word => word.toUpperCase().startsWith(letter));
-        return matchName && matchWebsite && matchSocial && matchLetter;
+        const matchName   = !query  || `${m.name} ${m.nickname} ${m.offer}`.toLowerCase().includes(query);
+        const matchLetter = !letter || m.name.split(/\s+/).some(word => word.toUpperCase().startsWith(letter));
+        return matchName && matchLetter;
       });
     }
 
     function applyFilters() {
-      const query   = searchInput.value.toLowerCase().trim();
-      const website = websiteFilter.value.toLowerCase();
-      const social  = socialFilter.value.toLowerCase();
-      const letter  = letterFilter.value;
-      const hasFilter = query || website || social || letter;
-
+      const query  = searchInput.value.toLowerCase().trim();
+      const letter = letterFilter.value;
+      const hasFilter = query || letter;
       searchClear.classList.toggle('visible', !!query);
       clearFilters.classList.toggle('visible', hasFilter);
-
       renderCards(getFiltered());
     }
 
     searchInput.addEventListener('input', applyFilters);
     letterFilter.addEventListener('change', applyFilters);
-    websiteFilter.addEventListener('change', applyFilters);
-    socialFilter.addEventListener('change', applyFilters);
 
     searchClear.addEventListener('click', () => {
       searchInput.value = '';
@@ -865,8 +847,6 @@
     clearFilters.addEventListener('click', () => {
       searchInput.value = '';
       letterFilter.value = '';
-      websiteFilter.value = '';
-      socialFilter.value = '';
       searchClear.classList.remove('visible');
       clearFilters.classList.remove('visible');
       renderCards(allMembers);
@@ -880,7 +860,6 @@
         { name: 'A Third Maker', offer: '3D printed items, laser engraving, custom keychains', websites: [], socials: [{type:'Instagram', handle:'@example'},{type:'Facebook', handle:'example'}] },
       ];
       allMembers = samples;
-      buildFilters();
       renderCards(samples);
       resultsCount.innerHTML = `<em style="color:var(--muted)">Preview mode — connect your Google Sheet CSV URL to show real members</em>`;
     }
