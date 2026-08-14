@@ -172,7 +172,7 @@
 
     /* ── Controls ── */
     .controls-wrap {
-      max-width: 1100px;
+      max-width: 700px;
       margin: 0 auto;
       padding: 0 20px 32px;
     }
@@ -265,7 +265,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      max-width: 1100px;
+      max-width: 700px;
       margin: 0 auto 18px;
       padding: 0 20px;
       font-size: 0.88rem;
@@ -290,21 +290,21 @@
 
     /* ── Master-Detail Layout ── */
     .directory-wrap {
-      max-width: 1100px;
+      max-width: 700px;
       margin: 0 auto;
       padding: 0 20px 60px;
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 20px;
-      align-items: start;
     }
 
-    /* ── Name List (left column) ── */
+    /* ── Name List ── */
     .name-list {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
+
+    /* Hide name list when detail is open — all screen sizes */
+    .directory-wrap.detail-open .name-list { display: none; }
+    .directory-wrap.detail-open .detail-panel { display: block; }
 
     .name-item {
       background: var(--panel);
@@ -350,15 +350,13 @@
 
     .name-item.active .name-arrow { opacity: 1; }
 
-    /* ── Detail Panel (right column) ── */
+    /* ── Detail Panel ── */
     .detail-panel {
+      display: none;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      position: sticky;
-      top: 20px;
-      min-height: 300px;
       overflow: hidden;
     }
 
@@ -564,7 +562,7 @@
 
     /* ── Mobile back button ── */
     .back-to-list {
-      display: none;
+      display: flex;
       align-items: center;
       gap: 6px;
       background: none;
@@ -586,11 +584,6 @@
       .controls { grid-template-columns: 1fr; }
       .filter-select { min-width: unset; }
       .site-header { padding: 36px 16px 28px; }
-      .directory-wrap { grid-template-columns: 1fr; }
-      .detail-panel { position: static; }
-      .back-to-list { display: flex; }
-      .directory-wrap.detail-open .name-list { display: none; }
-      .directory-wrap.detail-open .detail-panel { display: block; }
     }
     /* ── Celestial Background Canvas ── */
     #celestial-canvas {
@@ -906,10 +899,8 @@
             </div>` : ''}
         </div>`;
 
-      // On mobile, scroll detail into view
-      if (window.innerWidth <= 700) {
-        detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      // Scroll to top of detail panel on all screen sizes
+      detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     window.goBackToList = function() {
