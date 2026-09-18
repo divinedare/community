@@ -3,1068 +3,974 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Divine Purple Pages | Community Directory</title>
+  <title>The Real Purple Pages | A Divine Dare Community Directory</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Dancing+Script:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
     :root {
+      /* Cover palette */
+      --cover-bg: #2A0050;
+      --cover-mid: #4A0082;
+      --cover-text: #F0D893;
+      --cover-gold: #D4AF37;
+      --cover-gold-glow: rgba(212,175,55,0.4);
+
+      /* Inner page palette */
+      --page-bg: #F2EBFF;
+      --page-bg-2: #E8DBFF;
+      --page-text: #1A0033;
+      --page-purple: #5B1E9C;
+      --page-purple-light: #8A4BC8;
+      --page-gold: #7A5A00;
+      --page-divider: rgba(91,30,156,0.15);
+      --page-listing-border: rgba(91,30,156,0.12);
+
+      /* Shared */
       --gold: #D4AF37;
-      --gold-deep: #b8902c;
-      --gold-light: #F0D893;
-      --blue-glow: #6F8FE0;
-      --teal: #4F7CFF;
-      --bg: #0e0922;
-      --panel: #1B1238;
-      --panel-2: #241A47;
-      --text: #fbf8ff;
-      --muted: #c3b9e6;
-      --border: rgba(212,175,55,0.18);
-      --shadow: 0 16px 44px rgba(15,8,35,0.5);
-      --radius: 18px;
+      --radius: 4px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Montserrat', sans-serif;
-      background:
-        radial-gradient(circle at 10% 5%, rgba(111,143,224,0.18), transparent 40%),
-        radial-gradient(circle at 90% 15%, rgba(212,175,55,0.10), transparent 42%),
-        radial-gradient(circle at 50% 100%, rgba(79,124,255,0.12), transparent 50%),
-        linear-gradient(180deg, #0a0620 0%, #130e2c 100%);
-      color: var(--text);
+      background: #1A0033;
       min-height: 100vh;
-      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 16px 12px 40px;
     }
 
-    h1, h2, h3, .cinzel { font-family: 'Cinzel', serif; letter-spacing: 0.03em; }
-
-    /* ── Header ── */
-    .site-header {
-      text-align: center;
-      padding: 52px 20px 40px;
+    /* ── Book wrapper ── */
+    .book-wrap {
+      width: 100%;
+      max-width: 680px;
       position: relative;
     }
 
-    .site-header .eyebrow {
-      font-family: 'Cinzel', serif;
-      font-size: 0.82rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--blue-glow);
-      margin-bottom: 14px;
+    /* ── COVER ── */
+    #coverPage {
+      background: linear-gradient(160deg, #1A0033 0%, #3D0070 40%, #5A008A 65%, #1A0033 100%);
+      border-radius: 6px 2px 2px 6px;
+      min-height: 88vh;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        -6px 0 16px rgba(0,0,0,0.5),
+        6px 0 24px rgba(0,0,0,0.35),
+        inset -4px 0 12px rgba(0,0,0,0.3);
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0;
+    }
+
+    /* Spine strip */
+    #coverPage::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 22px;
+      background: linear-gradient(90deg, #0D001A, #2A005C 60%, transparent);
+      z-index: 2;
+    }
+
+    /* Gold corner arc */
+    #coverPage::after {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(from 200deg, transparent 50%, rgba(212,175,55,0.18) 60%, rgba(212,175,55,0.06) 75%, transparent 85%);
+      z-index: 1;
+    }
+
+    /* Stars canvas behind cover */
+    #coverCanvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .cover-content {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      padding: 36px 28px 0;
+      flex: 1;
+    }
+
+    .cover-eyebrow {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      color: var(--cover-gold);
+      opacity: 0.85;
+      letter-spacing: 0.02em;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .cover-title-wrap {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .cover-the {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      font-weight: 400;
+      color: var(--cover-gold);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      display: block;
+    }
+
+    .cover-real {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2rem, 6vw, 2.8rem);
+      color: var(--cover-text);
+      display: block;
+      line-height: 1;
+      text-shadow: 0 0 30px rgba(212,175,55,0.4), 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .cover-purple-pages {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.8rem, 9vw, 5rem);
+      font-weight: 900;
+      line-height: 0.9;
+      display: block;
+      background: linear-gradient(135deg, #F0D893 0%, #D4AF37 35%, #F0D893 60%, #C9A227 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 2px 8px rgba(212,175,55,0.5));
+      letter-spacing: 0.02em;
+    }
+
+    .cover-tagline {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.65rem, 2vw, 0.85rem);
+      color: rgba(240,216,147,0.7);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .cover-divider {
+      width: 80%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 18px 0;
+      opacity: 0.5;
+    }
+
+    /* Design space */
+    .cover-design-space {
+      width: 85%;
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 4px;
+      padding: 20px;
+      text-align: center;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
+      background: rgba(212,175,55,0.04);
     }
 
-    .site-header .eyebrow::before,
-    .site-header .eyebrow::after {
-      content: '';
-      display: block;
-      width: 40px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--blue-glow));
+    .cover-design-space-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      color: rgba(212,175,55,0.35);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
     }
 
-    .site-header .eyebrow::after {
-      background: linear-gradient(90deg, var(--blue-glow), transparent);
+    .cover-diamond {
+      color: rgba(212,175,55,0.2);
+      font-size: 2rem;
     }
 
-    .site-header h1 {
-      font-size: clamp(2.2rem, 5vw, 3.5rem);
-      color: var(--gold-light);
-      text-shadow: 0 0 30px rgba(212,175,55,0.3);
-      line-height: 1.1;
-      margin-bottom: 10px;
-    }
-
-    .site-header .star-divider {
-      color: var(--gold);
-      font-size: 1.2rem;
-      letter-spacing: 10px;
-      opacity: 0.6;
-      margin: 14px 0;
-    }
-
-    .site-header p {
-      color: var(--muted);
-      font-size: 1rem;
-      max-width: 560px;
-      margin: 0 auto 6px;
-    }
-
-    .header-cta {
-      display: inline-block;
-      margin-top: 20px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-deep));
-      color: #1a1530;
-      font-weight: 800;
-      font-family: 'Montserrat', sans-serif;
-      border-radius: 999px;
-      padding: 12px 28px;
-      font-size: 0.95rem;
-      text-decoration: none;
-      box-shadow: 0 8px 24px rgba(212,175,55,0.3);
-      transition: transform 0.12s ease;
-    }
-
-    .header-cta:hover { transform: translateY(-2px); }
-
-    .header-cta-outline {
-      display: inline-block;
-      margin-top: 20px;
-      background: transparent;
-      color: var(--gold-light);
-      font-weight: 700;
-      font-family: 'Montserrat', sans-serif;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      padding: 12px 28px;
-      font-size: 0.95rem;
-      text-decoration: none;
-      transition: transform 0.12s ease, border-color 0.12s ease;
-    }
-
-    .header-cta-outline:hover { transform: translateY(-2px); border-color: var(--gold); }
-
-    .header-btns {
+    .cover-bottom {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      padding: 16px 28px 24px;
       display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
     }
 
-    /* Card expand/collapse */
-    .card-body {
-      overflow: hidden;
-      max-height: 0;
-      transition: max-height 0.3s ease, padding 0.3s ease;
-      padding: 0 20px;
+    .cover-edition {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      color: rgba(212,175,55,0.45);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      line-height: 1.6;
     }
 
-    .member-card.open .card-body {
-      max-height: 600px;
-      padding: 18px 20px;
-    }
-
-    .card-name {
+    /* ── Animated Finger ── */
+    .finger-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
       cursor: pointer;
+      background: none;
+      border: none;
+      outline: none;
+      padding: 8px;
+    }
+
+    .finger-icon {
+      font-size: 2.2rem;
+      animation: fingerBounce 0.9s ease-in-out infinite;
+      display: block;
       user-select: none;
     }
 
-    .card-name .toggle-icon {
-      margin-left: auto;
-      font-size: 0.75rem;
-      color: var(--gold);
-      opacity: 0.7;
-      transition: transform 0.25s ease;
-      flex-shrink: 0;
+    .finger-icon.left-finger {
+      animation: fingerBounceLeft 0.9s ease-in-out infinite;
     }
 
-    .member-card.open .card-name .toggle-icon {
-      transform: rotate(180deg);
+    @keyframes fingerBounce {
+      0%, 100% { transform: translateX(0) rotate(-5deg); }
+      30% { transform: translateX(6px) rotate(5deg); }
+      60% { transform: translateX(3px) rotate(-3deg); }
     }
 
-    /* ── Controls ── */
-    .controls-wrap {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 0 20px 32px;
+    @keyframes fingerBounceLeft {
+      0%, 100% { transform: translateX(0) rotate(5deg); }
+      30% { transform: translateX(-6px) rotate(-5deg); }
+      60% { transform: translateX(-3px) rotate(3deg); }
     }
 
-    .controls {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 22px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 14px;
+    .finger-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      color: var(--cover-gold);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    /* ── INNER PAGES ── */
+    #innerSection {
+      display: none;
+    }
+
+    /* Search bar */
+    .search-bar-wrap {
+      background: linear-gradient(90deg, #3D0070, #5A008A);
+      padding: 12px 16px;
+      display: flex;
+      gap: 8px;
       align-items: center;
-      box-shadow: var(--shadow);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border-radius: 0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
-    .search-wrap {
+    .search-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--gold);
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+      opacity: 0.9;
+    }
+
+    .search-input-wrap {
+      flex: 1;
       position: relative;
     }
 
-    .search-wrap .icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--gold);
-      font-size: 1rem;
-      pointer-events: none;
-    }
-
-    .search-clear {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 50%;
-      display: none;
-      font-family: 'Montserrat', sans-serif;
-      line-height: 1;
-      transition: color 0.12s ease;
-    }
-
-    .search-clear:hover { color: var(--gold); }
-    .search-clear.visible { display: block; }
-
     .search-input {
       width: 100%;
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 20px;
+      color: #fff;
       font-family: 'Montserrat', sans-serif;
-      font-size: 0.95rem;
-      padding: 12px 38px 12px 40px;
+      font-size: 0.88rem;
+      padding: 8px 36px 8px 14px;
       outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      transition: border-color 0.15s;
     }
 
-    .search-input:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(212,175,55,0.15);
-    }
+    .search-input:focus { border-color: var(--gold); }
+    .search-input::placeholder { color: rgba(255,255,255,0.45); }
 
-    .search-input::placeholder { color: var(--muted); }
-
-    .filter-select {
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.9rem;
-      padding: 12px 14px;
-      outline: none;
+    .search-clear-inner {
+      position: absolute;
+      right: 10px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: rgba(255,255,255,0.5);
       cursor: pointer;
-      min-width: 160px;
-      transition: border-color 0.15s ease;
+      font-size: 0.9rem;
+      display: none;
     }
 
-    .filter-select:focus { border-color: var(--gold); }
+    .search-clear-inner.visible { display: block; }
 
-    /* ── Results count ── */
-    .results-bar {
+    /* Page */
+    .dir-page {
+      background: var(--page-bg);
+      min-height: 80vh;
+      position: relative;
+      border-top: 3px solid var(--cover-gold);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    /* Page flip animation */
+    .page-flip-forward {
+      animation: flipForward 0.35s ease-out;
+    }
+
+    .page-flip-back {
+      animation: flipBack 0.35s ease-out;
+    }
+
+    @keyframes flipForward {
+      from { opacity: 0.3; transform: perspective(800px) rotateY(-12deg) translateX(20px); }
+      to   { opacity: 1;   transform: perspective(800px) rotateY(0deg)   translateX(0); }
+    }
+
+    @keyframes flipBack {
+      from { opacity: 0.3; transform: perspective(800px) rotateY(12deg) translateX(-20px); }
+      to   { opacity: 1;   transform: perspective(800px) rotateY(0deg)  translateX(0); }
+    }
+
+    /* Page header strip */
+    .page-header-strip {
+      background: linear-gradient(90deg, #3D0070 0%, #5A008A 50%, #3D0070 100%);
+      padding: 8px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      max-width: 700px;
-      margin: 0 auto 18px;
-      padding: 0 20px;
-      font-size: 0.88rem;
-      color: var(--muted);
     }
 
-    .results-bar strong { color: var(--gold); }
+    .page-section-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
 
-    .clear-filters {
+    .page-number-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem;
+      color: rgba(212,175,55,0.65);
+      letter-spacing: 0.1em;
+    }
+
+    /* Listings container */
+    .listings-wrap {
+      padding: 0;
+    }
+
+    /* Individual listing */
+    .listing {
+      border-bottom: 1px solid var(--page-listing-border);
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      position: relative;
+      transition: background 0.1s;
+    }
+
+    .listing:hover { background: rgba(91,30,156,0.04); }
+
+    .listing:last-child { border-bottom: none; }
+
+    /* Gold bar on left of listing */
+    .listing::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 14px; bottom: 14px;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold), transparent);
+      opacity: 0.5;
+      border-radius: 2px;
+    }
+
+    .listing-photos {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .listing-photo {
+      width: 58px;
+      height: 58px;
+      object-fit: cover;
+      border-radius: 3px;
+      border: 1px solid rgba(91,30,156,0.2);
+      background: var(--page-bg-2);
+    }
+
+    .listing-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .listing-name {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.92rem, 2.5vw, 1.05rem);
+      font-weight: 700;
+      color: var(--page-purple);
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+
+    .listing-known-as {
+      font-family: 'Dancing Script', cursive;
+      font-size: 0.88rem;
+      color: var(--page-purple-light);
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .listing-offer {
+      font-size: 0.8rem;
+      color: #3A1A55;
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+
+    .listing-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .listing-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.12s;
+    }
+
+    .listing-pill:hover { opacity: 0.8; }
+
+    .listing-pill.web {
+      background: rgba(91,30,156,0.12);
+      border: 1px solid rgba(91,30,156,0.22);
+      color: var(--page-purple);
+    }
+
+    .listing-pill.social {
+      background: rgba(212,175,55,0.1);
+      border: 1px solid rgba(212,175,55,0.25);
+      color: var(--page-gold);
+    }
+
+    .listing-pill i { font-size: 0.7rem; }
+
+    /* ── Page navigation ── */
+    .page-nav {
+      background: linear-gradient(90deg, #2A0050, #3D0070 50%, #2A0050);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-finger-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
       background: none;
       border: none;
-      color: var(--blue-glow);
+      padding: 6px 10px;
+      outline: none;
+      min-width: 60px;
+    }
+
+    .nav-finger-btn:disabled {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    .nav-finger-icon {
+      font-size: 1.6rem;
+      display: block;
+      animation: fingerBounce 0.9s ease-in-out infinite;
+    }
+
+    .nav-finger-icon.left-finger {
+      animation: fingerBounceLeft 0.9s ease-in-out infinite;
+    }
+
+    .nav-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.55rem;
+      color: var(--gold);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .page-counter {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      color: rgba(212,175,55,0.65);
+      text-align: center;
+      letter-spacing: 0.08em;
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 50px 24px;
+      text-align: center;
+    }
+
+    .empty-state p {
+      font-family: 'Cinzel', serif;
+      color: var(--page-purple-light);
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    /* Results info bar */
+    .results-info {
+      padding: 8px 16px;
       font-family: 'Montserrat', sans-serif;
-      font-size: 0.88rem;
+      font-size: 0.75rem;
+      color: rgba(91,30,156,0.6);
+      background: var(--page-bg);
+      border-bottom: 1px solid var(--page-listing-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .clear-search-btn {
+      background: none; border: none;
+      color: var(--page-purple-light);
+      font-size: 0.72rem;
       font-weight: 600;
       cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
       text-decoration: underline;
       display: none;
     }
 
-    .clear-filters.visible { display: inline; }
-
-    /* ── Master-Detail Layout ── */
-    .directory-wrap {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 0 20px 60px;
-    }
-
-    /* ── Name List ── */
-    .name-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    /* Hide name list when detail is open — all screen sizes */
-    .directory-wrap.detail-open .name-list { display: none; }
-    .directory-wrap.detail-open .detail-panel { display: block; }
-
-    .name-item {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      font-family: 'Cinzel', serif;
-      font-size: 0.97rem;
-      color: var(--gold);
-      transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-      user-select: none;
-    }
-
-    .name-item::before {
-      content: '✦';
-      font-size: 0.6rem;
-      opacity: 0.6;
-      flex-shrink: 0;
-    }
-
-    .name-item .name-arrow {
-      margin-left: auto;
-      font-size: 0.7rem;
-      opacity: 0.5;
-      transition: opacity 0.15s ease;
-    }
-
-    .name-item:hover {
-      border-color: rgba(212,175,55,0.45);
-      background: rgba(212,175,55,0.06);
-    }
-
-    .name-item.active {
-      border-color: var(--gold);
-      background: linear-gradient(90deg, rgba(212,175,55,0.18), rgba(111,143,224,0.10));
-      box-shadow: 0 0 0 1px rgba(212,175,55,0.15), 0 8px 24px rgba(15,8,35,0.4);
-      color: var(--gold-light);
-    }
-
-    .name-item.active .name-arrow { opacity: 1; }
-
-    /* ── Detail Panel ── */
-    .detail-panel {
-      display: none;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .detail-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 60px 30px;
-      color: var(--muted);
-      height: 100%;
-    }
-
-    .detail-placeholder .icon {
-      font-size: 2rem;
-      color: var(--gold);
-      opacity: 0.3;
-      display: block;
-      margin-bottom: 14px;
-    }
-
-    .detail-placeholder p { font-size: 0.95rem; }
-
-    .detail-header {
-      padding: 18px 24px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(90deg, rgba(212,175,55,0.14), rgba(111,143,224,0.08));
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .detail-header-name {
-      font-family: 'Cinzel', serif;
-      font-size: 1.2rem;
-      color: var(--gold-light);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .detail-header-name::before {
-      content: '✦';
-      color: var(--gold);
-      font-size: 0.7rem;
-      opacity: 0.7;
-      flex-shrink: 0;
-    }
-
-    .detail-header-name::after {
-      content: '✦';
-      color: var(--gold);
-      font-size: 0.7rem;
-      opacity: 0.7;
-      flex-shrink: 0;
-    }
-
-    .detail-known-as {
-      font-size: 0.85rem;
-      color: var(--muted);
-      font-style: italic;
-      padding-left: 2px;
-    }
-
-    .detail-body {
-      padding: 22px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .detail-offer {
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.7;
-    }
-
-    .card-links {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .links-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--gold);
-      opacity: 0.8;
-    }
-
-    .link-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      row-gap: 10px;
-    }
-
-    .link-pill {
-      display: inline-flex;
-      align-items: center;
-      background: rgba(212,175,55,0.08);
-      border: 1px solid rgba(212,175,55,0.22);
-      border-radius: 999px;
-      padding: 8px 16px;
-      font-size: 0.83rem;
-      font-weight: 600;
-      color: var(--gold-light);
-      text-decoration: none;
-      transition: background 0.12s ease, border-color 0.12s ease;
-    }
-
-    .link-pill:hover {
-      background: rgba(212,175,55,0.18);
-      border-color: var(--gold);
-    }
-
-    .link-pill.social {
-      background: rgba(111,143,224,0.10);
-      border-color: rgba(111,143,224,0.25);
-      color: #d4dcff;
-    }
-
-    .link-pill.social:hover {
-      background: rgba(111,143,224,0.22);
-      border-color: var(--blue-glow);
-    }
-
-    .divider {
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* ── Empty / Loading states ── */
-    .state-box {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-    }
-
-    .state-box .state-icon {
-      font-size: 2.5rem;
-      color: var(--gold);
-      opacity: 0.4;
-      display: block;
-      margin-bottom: 16px;
-    }
-
-    .state-box h3 {
-      font-family: 'Cinzel', serif;
-      color: var(--gold-light);
-      margin-bottom: 8px;
-      opacity: 0.7;
-    }
-
-    .state-box p { font-size: 0.95rem; }
-
-    /* ── Footer ── */
-    .site-footer {
-      text-align: center;
-      padding: 20px;
-      color: var(--muted);
-      font-size: 0.8rem;
-      border-top: 1px solid var(--border);
-      opacity: 0.6;
-    }
+    .clear-search-btn.visible { display: inline; }
 
     /* ── Responsive ── */
-    /* ── Pagination ── */
-    .pagination {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 12px;
-      flex-wrap: wrap;
+    @media (min-width: 600px) {
+      body { padding: 24px 20px 60px; }
     }
 
-    .page-btn {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--gold-light);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      padding: 8px 18px;
-      cursor: pointer;
-      transition: border-color 0.15s ease, background 0.15s ease;
+    @media (prefers-reduced-motion: reduce) {
+      .finger-icon, .nav-finger-icon { animation: none; }
+      .page-flip-forward, .page-flip-back { animation: none; }
     }
-
-    .page-btn:hover:not(:disabled) { border-color: var(--gold); background: rgba(212,175,55,0.08); }
-    .page-btn:disabled { opacity: 0.35; cursor: default; }
-
-    .page-info {
-      color: var(--muted);
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-
-    /* ── Mobile back button ── */
-    .back-to-list {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      width: 100%;
-      text-align: left;
-    }
-
-    .back-to-list:hover { color: var(--gold); }
-
-    @media (max-width: 700px) {
-      .controls { grid-template-columns: 1fr; }
-      .filter-select { min-width: unset; }
-      .site-header { padding: 36px 16px 28px; }
-    }
-    /* ── Celestial Background Canvas ── */
-    #celestial-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Ensure content sits above canvas */
-    .site-header, .controls-wrap, .results-bar, .directory-wrap, .site-footer {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Gold spray orbs */
-    .gold-orb {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(80px);
-      opacity: 0;
-      animation: orbPulse var(--dur, 8s) ease-in-out infinite var(--delay, 0s);
-    }
-
-    @keyframes orbPulse {
-      0%, 100% { opacity: 0; transform: scale(0.85); }
-      50% { opacity: var(--peak, 0.12); transform: scale(1); }
-    }
-
   </style>
 </head>
 <body>
 
-  <!-- Celestial canvas for twinkling stars -->
-  <canvas id="celestial-canvas"></canvas>
+<div class="book-wrap">
 
-  <!-- Gold spray orbs for luxury depth -->
-  <div class="gold-orb" style="width:500px;height:500px;background:radial-gradient(circle,#D4AF37,transparent 70%);top:-120px;left:-100px;--dur:10s;--delay:0s;--peak:0.07;"></div>
-  <div class="gold-orb" style="width:400px;height:400px;background:radial-gradient(circle,#C8A24A,transparent 70%);top:30%;right:-80px;--dur:13s;--delay:2s;--peak:0.05;"></div>
-  <div class="gold-orb" style="width:600px;height:600px;background:radial-gradient(circle,#6F8FE0,transparent 70%);bottom:10%;left:20%;--dur:15s;--delay:4s;--peak:0.04;"></div>
-  <div class="gold-orb" style="width:350px;height:350px;background:radial-gradient(circle,#D4AF37,transparent 70%);bottom:-80px;right:15%;--dur:11s;--delay:1s;--peak:0.06;"></div>
-  <div class="gold-orb" style="width:280px;height:280px;background:radial-gradient(circle,#F0D893,transparent 70%);top:55%;left:5%;--dur:9s;--delay:3s;--peak:0.04;"></div>
+  <!-- ── COVER ── -->
+  <div id="coverPage">
+    <canvas id="coverCanvas"></canvas>
 
-  <!-- ── Header ── -->
-  <header class="site-header">
-    <p class="eyebrow">A Divine Dare Studio</p>
-    <h1>The Divine Purple Pages</h1>
-    <div class="star-divider">✦ &nbsp; ✦ &nbsp; ✦</div>
-    <p>Browse our community of creators, makers, and entrepreneurs. Find someone who offers what you need — then follow, support, and cheer them on.</p>
-    <div class="header-btns">
-      <a href="https://divinedare.github.io/community/submit.html" class="header-cta">+ Add Your Listing</a>
-      <a href="https://divinedare.github.io/community/manage.html" class="header-cta-outline">Manage My Listing</a>
-    </div>
-  </header>
+    <div class="cover-content">
+      <div class="cover-eyebrow">A Divine Dare Studio presents</div>
 
-  <!-- ── Search & Filter Controls ── -->
-  <div class="controls-wrap">
-    <div class="controls">
-      <div class="search-wrap">
-        <span class="icon">✦</span>
-        <input
-          class="search-input"
-          id="searchInput"
-          type="text"
-          placeholder="Search"
-          autocomplete="off"
-        />
-        <button class="search-clear" id="searchClear" type="button" title="Clear search">✕</button>
+      <div class="cover-title-wrap">
+        <span class="cover-the">The</span>
+        <span class="cover-real">Real</span>
+        <span class="cover-purple-pages">Purple<br>Pages</span>
+        <div class="cover-tagline">Community Directory</div>
       </div>
-      <select class="filter-select" id="letterFilter" style="min-width:120px;">
-        <option value="">A – Z</option>
-        <option>A</option><option>B</option><option>C</option><option>D</option>
-        <option>E</option><option>F</option><option>G</option><option>H</option>
-        <option>I</option><option>J</option><option>K</option><option>L</option>
-        <option>M</option><option>N</option><option>O</option><option>P</option>
-        <option>Q</option><option>R</option><option>S</option><option>T</option>
-        <option>U</option><option>V</option><option>W</option><option>X</option>
-        <option>Y</option><option>Z</option>
-      </select>
+
+      <div class="cover-divider"></div>
+
+      <!-- Space left for custom design work -->
+      <div class="cover-design-space">
+        <div class="cover-diamond">◆</div>
+        <div class="cover-design-space-label">Your design space</div>
+        <div class="cover-design-space-label" style="opacity:0.5;">Add your logo, imagery,<br>or edition details here</div>
+        <div class="cover-diamond">◆</div>
+      </div>
+    </div>
+
+    <div class="cover-bottom">
+      <div class="cover-edition">
+        A Divine Dare Studio<br>
+        Creator Community
+      </div>
+      <button class="finger-btn" id="openDirBtn">
+        <span class="finger-icon">☞</span>
+        <span class="finger-label">Open</span>
+      </button>
     </div>
   </div>
 
-  <!-- ── Results Bar ── -->
-  <div class="results-bar">
-    <span id="resultsCount">Loading members...</span>
-    <button class="clear-filters" id="clearFilters">Clear filters</button>
-  </div>
+  <!-- ── INNER DIRECTORY SECTION ── -->
+  <div id="innerSection">
 
-  <!-- ── Master-Detail Layout ── -->
-  <div class="directory-wrap" id="directoryWrap">
-    <div class="name-list" id="nameList">
-      <div class="state-box">
-        <span class="state-icon">✦</span>
-        <h3>Loading the Spotlight...</h3>
-        <p>Connecting to the community directory.</p>
+    <!-- Sticky search bar -->
+    <div class="search-bar-wrap">
+      <div class="search-logo">Purple Pages</div>
+      <div class="search-input-wrap">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search by name, craft, or offer..." autocomplete="off" />
+        <button class="search-clear-inner" id="searchClearBtn">✕</button>
       </div>
     </div>
-    <div class="detail-panel" id="detailPanel">
-      <div class="detail-placeholder">
-        <span class="icon">✦</span>
-        <p>Select a name on the left to view their listing.</p>
+
+    <!-- Directory page (reused, content swapped) -->
+    <div class="dir-page" id="dirPage">
+      <div class="page-header-strip">
+        <span class="page-section-label" id="sectionLabel">Community Members</span>
+        <span class="page-number-badge" id="pageNumberBadge">Page 1</span>
+      </div>
+
+      <div class="results-info" id="resultsInfo">
+        <span id="resultsCount">Loading...</span>
+        <button class="clear-search-btn" id="clearSearchBtn">Clear search</button>
+      </div>
+
+      <div class="listings-wrap" id="listingsWrap">
+        <div class="empty-state"><p>Loading the community...</p></div>
+      </div>
+
+      <div class="page-nav" id="pageNav">
+        <button class="nav-finger-btn" id="prevBtn" disabled>
+          <span class="nav-finger-icon left-finger">☜</span>
+          <span class="nav-label">Prev</span>
+        </button>
+        <div class="page-counter" id="pageCounter">— / —</div>
+        <button class="nav-finger-btn" id="nextBtn">
+          <span class="nav-finger-icon">☞</span>
+          <span class="nav-label">Next</span>
+        </button>
       </div>
     </div>
+
   </div>
+</div>
 
-  <footer class="site-footer">
-    The Divine Purple Pages Community Directory &nbsp;✦&nbsp; A Divine Dare Studio
-  </footer>
+<script>
+  // ── Config ──
+  const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSZOFYPib4sTBV8tH1EqDHWAXbdYshvorYedFZs8aF_B9AofcMM1Z7iWrgcSIjfOMEOt0Kx0oRJLgvu/pub?output=csv';
+  const PAGE_SIZE = 5;
 
-  <script>
-    // Google Sheet published CSV URL
-    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSZOFYPib4sTBV8tH1EqDHWAXbdYshvorYedFZs8aF_B9AofcMM1Z7iWrgcSIjfOMEOt0Kx0oRJLgvu/pub?output=csv';
+  // ── Social icon map ──
+  const SOCIAL_ICONS = {
+    'instagram': 'fa-brands fa-instagram',
+    'tiktok': 'fa-brands fa-tiktok',
+    'facebook': 'fa-brands fa-facebook',
+    'facebook page': 'fa-brands fa-facebook',
+    'facebook group': 'fa-brands fa-facebook-f',
+    'pinterest': 'fa-brands fa-pinterest',
+    'youtube': 'fa-brands fa-youtube',
+    'twitter / x': 'fa-brands fa-x-twitter',
+    'threads': 'fa-brands fa-threads',
+    'linkedin': 'fa-brands fa-linkedin',
+    'snapchat': 'fa-brands fa-snapchat',
+  };
 
-    let allMembers = [];
+  // ── State ──
+  let allMembers = [];
+  let filteredMembers = [];
+  let currentPage = 0;
+  let isOpen = false;
+  let lastDirection = 'forward';
 
-    const searchInput    = document.getElementById('searchInput');
-    const searchClear    = document.getElementById('searchClear');
-    const nameList       = document.getElementById('nameList');
-    const detailPanel    = document.getElementById('detailPanel');
-    const resultsCount   = document.getElementById('resultsCount');
-    const clearFilters   = document.getElementById('clearFilters');
-    const letterFilter   = document.getElementById('letterFilter');
+  // ── DOM refs ──
+  const coverPage       = document.getElementById('coverPage');
+  const innerSection    = document.getElementById('innerSection');
+  const openDirBtn      = document.getElementById('openDirBtn');
+  const dirPage         = document.getElementById('dirPage');
+  const listingsWrap    = document.getElementById('listingsWrap');
+  const pageNav         = document.getElementById('pageNav');
+  const prevBtn         = document.getElementById('prevBtn');
+  const nextBtn         = document.getElementById('nextBtn');
+  const pageCounter     = document.getElementById('pageCounter');
+  const pageNumberBadge = document.getElementById('pageNumberBadge');
+  const sectionLabel    = document.getElementById('sectionLabel');
+  const searchInput     = document.getElementById('searchInput');
+  const searchClearBtn  = document.getElementById('searchClearBtn');
+  const clearSearchBtn  = document.getElementById('clearSearchBtn');
+  const resultsCount    = document.getElementById('resultsCount');
+  const resultsInfo     = document.getElementById('resultsInfo');
 
-    let activeIndex = null;
-
-    // ── Fetch & parse sheet data ──
-    async function loadDirectory() {
-      if (!SHEET_CSV_URL || SHEET_CSV_URL === 'SHEET_CSV_URL') {
-        showPlaceholderCards();
-        return;
-      }
-
-      try {
-        const res = await fetch(SHEET_CSV_URL);
-        const text = await res.text();
-        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
-        allMembers = parsed.data
-          .filter(row => row['Name'] && row['Name'].trim())
-          .filter(row => row['Directory Permission'] !== 'No')
-          .map(parseRow)
-          .sort((a, b) => a.name.localeCompare(b.name));
-        renderCards(allMembers);
-      } catch (err) {
-        nameList.innerHTML = `
-          <div class="state-box">
-            <span class="state-icon">✦</span>
-            <h3>Couldn't load the directory</h3>
-            <p>Check that the Google Sheet CSV URL is correct and the sheet is published publicly.</p>
-          </div>`;
-      }
+  // ── Cover canvas stars ──
+  (function() {
+    const canvas = document.getElementById('coverCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    function resize() {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
     }
-
-    function parseRow(row) {
-      let websites = [];
-      let socials = [];
-      try { websites = JSON.parse(row['Websites'] || '[]'); } catch(e) {}
-      try { socials = JSON.parse(row['Socials'] || '[]'); } catch(e) {}
-      return {
-        name:     (row['Name'] || '').trim(),
-        nickname: (row['Nickname'] || '').trim(),
-        email:    (row['Email'] || '').trim(),
-        offer:    (row['What You Offer'] || '').trim(),
-        websites: websites.filter(w => w.type || w.url).sort((a, b) => (a.type || '').localeCompare(b.type || '')),
-        socials:  socials.filter(s => s.type || s.handle).sort((a, b) => (a.type || '').localeCompare(b.type || ''))
-      };
-    }
-
-    // ── Build social URL ──
-    function buildSocialUrl(s) {
-      const handle = (s.handle || '').trim();
-      if (!handle) return '#';
-      // If it's already a full URL, use it directly
-      if (handle.startsWith('http') || handle.startsWith('www.')) {
-        return handle.startsWith('www.') ? 'https://' + handle : handle;
-      }
-      // Fallback for old entries that only have a handle/username
-      const platform = (s.type || '').toLowerCase();
-      const slug = handle.replace('@','');
-      if (platform.includes('instagram'))  return `https://instagram.com/${slug}`;
-      if (platform.includes('tiktok'))     return `https://tiktok.com/@${slug}`;
-      if (platform.includes('facebook'))   return `https://facebook.com/${slug}`;
-      if (platform.includes('pinterest'))  return `https://pinterest.com/${slug}`;
-      if (platform.includes('youtube'))    return `https://youtube.com/@${slug}`;
-      if (platform.includes('twitter') || platform.includes('x')) return `https://x.com/${slug}`;
-      if (platform.includes('threads'))    return `https://threads.net/@${slug}`;
-      if (platform.includes('linkedin'))   return `https://linkedin.com/in/${slug}`;
-      return '#';
-    }
-
-    // ── Render name list ──
-    const PAGE_SIZE = 5;
-    let currentPage = 0;
-    let currentList = [];
-
-    function renderCards(members) {
-      currentList = members;
-      currentPage = 0;
-      activeIndex = null;
-      detailPanel.innerHTML = `<div class="detail-placeholder"><span class="icon">✦</span><p>Select a name to view their listing.</p></div>`;
-      document.getElementById('directoryWrap').classList.remove('detail-open');
-      renderPage();
-    }
-
-    function renderPage() {
-      const total = currentList.length;
-      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-      const start = currentPage * PAGE_SIZE;
-      const end = Math.min(start + PAGE_SIZE, total);
-      const pageMembers = currentList.slice(start, end);
-
-      if (total === 0) {
-        resultsCount.innerHTML = '<strong>0</strong> members found';
-        nameList.innerHTML = `
-          <div class="state-box">
-            <span class="state-icon">✦</span>
-            <h3>No matches found</h3>
-            <p>Try a different search term or clear your filters.</p>
-          </div>`;
-        return;
-      }
-
-      resultsCount.innerHTML = `<strong>${total}</strong> member${total !== 1 ? 's' : ''} in the spotlight`;
-
-      const namesHtml = pageMembers.map((m, i) => `
-        <div class="name-item" data-index="${start + i}" onclick="selectMember(${start + i})">
-          ${escHtml(m.name)}
-          <span class="name-arrow">›</span>
-        </div>`).join('');
-
-      const paginationHtml = totalPages > 1 ? `
-        <div class="pagination">
-          <button class="page-btn" onclick="changePage(-1)" ${currentPage === 0 ? 'disabled' : ''}>← Prev</button>
-          <span class="page-info">Page ${currentPage + 1} of ${totalPages}</span>
-          <button class="page-btn" onclick="changePage(1)" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>Next →</button>
-        </div>` : '';
-
-      nameList.innerHTML = namesHtml + paginationHtml;
-    }
-
-    window.changePage = function(dir) {
-      const totalPages = Math.ceil(currentList.length / PAGE_SIZE);
-      currentPage = Math.max(0, Math.min(currentPage + dir, totalPages - 1));
-      activeIndex = null;
-      detailPanel.innerHTML = `<div class="detail-placeholder"><span class="icon">✦</span><p>Select a name to view their listing.</p></div>`;
-      document.getElementById('directoryWrap').classList.remove('detail-open');
-      renderPage();
-      nameList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
-    // ── Show detail panel for selected member ──
-    // ── Social icon map (Font Awesome 6 brand icons) ──
-    const socialIconMap = {
-      'instagram':     'fa-brands fa-instagram',
-      'tiktok':        'fa-brands fa-tiktok',
-      'facebook':      'fa-brands fa-facebook',
-      'facebook page': 'fa-brands fa-facebook',
-      'facebook group':'fa-brands fa-facebook-f',
-      'pinterest':     'fa-brands fa-pinterest',
-      'youtube':       'fa-brands fa-youtube',
-      'twitter / x':   'fa-brands fa-x-twitter',
-      'threads':       'fa-brands fa-threads',
-      'linkedin':      'fa-brands fa-linkedin',
-      'snapchat':      'fa-brands fa-snapchat',
-    };
-
-    window.selectMember = function(index) {
-      const filtered = getFiltered();
-      const m = filtered[index];
-      if (!m) return;
-
-      document.querySelectorAll('.name-item').forEach(el => el.classList.remove('active'));
-      const activeEl = document.querySelector(`.name-item[data-index="${index}"]`);
-      if (activeEl) activeEl.classList.add('active');
-
-      // Mobile: show detail panel, hide name list
-      const wrap = document.getElementById('directoryWrap');
-      wrap.classList.add('detail-open');
-
-      // Website pills — globe icon + type label
-      const websiteLinks = m.websites.map(w => {
-        const url = w.url ? (w.url.startsWith('http') ? w.url : 'https://' + w.url) : '#';
-        return `<a class="link-pill" href="${url}" target="_blank" rel="noopener"><i class="fa-solid fa-globe" style="font-size:0.75rem; margin-right:5px;"></i>${escHtml(w.type || 'Website')}</a>`;
-      }).join('');
-
-      // Social pills — brand icon + type label (text only for Other)
-      const socialLinks = m.socials.map(s => {
-        const url = buildSocialUrl(s);
-        const iconClass = socialIconMap[(s.type || '').toLowerCase()];
-        const iconHtml = iconClass ? `<i class="${iconClass}" style="font-size:0.85rem; margin-right:5px;"></i>` : '';
-        return `<a class="link-pill social" href="${url}" target="_blank" rel="noopener">${iconHtml}${escHtml(s.type || 'Social')}</a>`;
-      }).join('');
-
-      const allLinks = websiteLinks + socialLinks;
-      const hasLinks = allLinks.length > 0;
-      const hasOffer = m.offer && m.offer !== 'Socials only';
-
-      detailPanel.innerHTML = `
-        <button class="back-to-list" onclick="goBackToList()">← All Members</button>
-        <div class="detail-header">
-          <span class="detail-header-name">${escHtml(m.name)}</span>
-          ${m.nickname ? `<span class="detail-known-as">Known as ${escHtml(m.nickname)}</span>` : ''}
-        </div>
-        <div class="detail-body">
-          ${hasOffer ? `<p class="detail-offer">${escHtml(m.offer)}</p>` : ''}
-          ${hasLinks ? `
-            ${hasOffer ? '<div class="divider"></div>' : ''}
-            <div class="card-links">
-              <span class="links-label">Let's Connect</span>
-              <div class="link-pills">${allLinks}</div>
-            </div>` : ''}
-        </div>`;
-
-      // Scroll to top of detail panel on all screen sizes
-      detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
-    window.goBackToList = function() {
-      document.getElementById('directoryWrap').classList.remove('detail-open');
-      nameList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
-    function escHtml(str) {
-      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    // ── Live filter logic ──
-    function getFiltered() {
-      const query  = searchInput.value.toLowerCase().trim();
-      const letter = letterFilter.value.toUpperCase();
-      return allMembers.filter(m => {
-        const matchName   = !query  || `${m.name} ${m.nickname} ${m.offer}`.toLowerCase().includes(query);
-        const matchLetter = !letter || m.name.split(/\s+/).some(word => word.toUpperCase().startsWith(letter));
-        return matchName && matchLetter;
+    resize();
+    const stars = Array.from({length: 90}, () => ({
+      x: Math.random(), y: Math.random(),
+      r: 0.3 + Math.random() * 1.0,
+      isDiamond: Math.random() < 0.08,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.3 + Math.random() * 0.6,
+      isGold: Math.random() < 0.1,
+    }));
+    let last = 0;
+    function draw(ts) {
+      const dt = (ts - last) / 1000; last = ts;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.phase += dt * s.speed;
+        const tw = 0.5 + 0.5 * (1 + Math.sin(s.phase)) * 0.5;
+        const alpha = 0.06 + tw * 0.38;
+        const sx = s.x * canvas.width, sy = s.y * canvas.height;
+        if (s.isDiamond) {
+          const size = s.r * 3.2;
+          ctx.save(); ctx.translate(sx, sy);
+          ctx.rotate(Math.PI / 4 * Math.sin(s.phase * 0.3));
+          ctx.fillStyle = s.isGold ? `rgba(212,175,55,${alpha})` : `rgba(255,255,255,${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(0,-size); ctx.quadraticCurveTo(size*0.15,-size*0.15,size,0);
+          ctx.quadraticCurveTo(size*0.15,size*0.15,0,size);
+          ctx.quadraticCurveTo(-size*0.15,size*0.15,-size,0);
+          ctx.quadraticCurveTo(-size*0.15,-size*0.15,0,-size);
+          ctx.closePath(); ctx.fill(); ctx.restore();
+        } else {
+          const g = ctx.createRadialGradient(sx,sy,0,sx,sy,s.r*5);
+          const c = s.isGold ? 'rgba(212,175,55,' : 'rgba(255,255,255,';
+          g.addColorStop(0, c+alpha+')'); g.addColorStop(1, c+'0)');
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(sx,sy,s.r*5,0,Math.PI*2); ctx.fill();
+        }
       });
-    }
-
-    function applyFilters() {
-      const query  = searchInput.value.toLowerCase().trim();
-      const letter = letterFilter.value;
-      const hasFilter = query || letter;
-      searchClear.classList.toggle('visible', !!query);
-      clearFilters.classList.toggle('visible', hasFilter);
-      renderCards(getFiltered());
-    }
-
-    searchInput.addEventListener('input', applyFilters);
-    letterFilter.addEventListener('change', applyFilters);
-
-    searchClear.addEventListener('click', () => {
-      searchInput.value = '';
-      searchClear.classList.remove('visible');
-      applyFilters();
-      searchInput.focus();
-    });
-
-    clearFilters.addEventListener('click', () => {
-      searchInput.value = '';
-      letterFilter.value = '';
-      searchClear.classList.remove('visible');
-      clearFilters.classList.remove('visible');
-      renderCards(allMembers);
-    });
-
-    // ── Placeholder cards (for when CSV URL isn't set yet) ──
-    function showPlaceholderCards() {
-      const samples = [
-        { name: 'Sample Member', offer: 'Custom tumblers, DTF prints, and sublimation gifts', websites: [{type:'Etsy', url:'#'}], socials: [{type:'Instagram', handle:'@example'}] },
-        { name: 'Another Creator', offer: 'Digital planners, SVG files, and Canva templates', websites: [{type:'Shopify', url:'#'}], socials: [{type:'TikTok', handle:'@example'}] },
-        { name: 'A Third Maker', offer: '3D printed items, laser engraving, custom keychains', websites: [], socials: [{type:'Instagram', handle:'@example'},{type:'Facebook', handle:'example'}] },
-      ];
-      allMembers = samples;
-      renderCards(samples);
-      resultsCount.innerHTML = `<em style="color:var(--muted)">Preview mode — connect your Google Sheet CSV URL to show real members</em>`;
-    }
-
-    loadDirectory();
-  </script>
-  <script>
-    // ── Celestial Twinkling Stars ──
-    (function() {
-      const canvas = document.getElementById('celestial-canvas');
-      const ctx = canvas.getContext('2d');
-
-      function resize() {
-        canvas.width  = window.innerWidth;
-        canvas.height = Math.max(document.body.scrollHeight, window.innerHeight);
-      }
-      resize();
-      window.addEventListener('resize', resize);
-
-      // Star types: small white sparklers + occasional larger diamond stars
-      const stars = [];
-      const STAR_COUNT = 140;
-
-      for (let i = 0; i < STAR_COUNT; i++) {
-        const isDiamond = Math.random() < 0.07; // fewer diamond stars
-        stars.push({
-          x:        Math.random(),
-          y:        Math.random(),
-          baseR:    isDiamond ? (1.0 + Math.random() * 0.9) : (0.2 + Math.random() * 0.7),
-          isDiamond,
-          phase:    Math.random() * Math.PI * 2,
-          speed:    0.3 + Math.random() * 0.8,
-          twinkleAmp: isDiamond ? 0.65 : 0.4 + Math.random() * 0.3,
-          isGold:   Math.random() < 0.06,
-        });
-      }
-
-      let lastTime = 0;
-
-      function draw(timestamp) {
-        const dt = (timestamp - lastTime) / 1000;
-        lastTime = timestamp;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        const h = canvas.height;
-        const w = canvas.width;
-
-        stars.forEach(s => {
-          s.phase += dt * s.speed;
-          const twinkle = 0.5 + s.twinkleAmp * 0.5 * (1 + Math.sin(s.phase));
-          const r = s.baseR * (0.5 + twinkle * 0.5);
-          const alpha = 0.08 + twinkle * 0.45;
-
-          const sx = s.x * w;
-          const sy = s.y * h;
-
-          if (s.isDiamond) {
-            // Diamond 4-point sparkle shape
-            const size = r * 3.5;
-            ctx.save();
-            ctx.translate(sx, sy);
-            ctx.rotate(Math.PI / 4 * Math.sin(s.phase * 0.3));
-
-            // Outer glow
-            const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 2.5);
-            const col = s.isGold ? `rgba(240,216,147,${alpha * 0.12})` : `rgba(255,255,255,${alpha * 0.08})`;
-            glow.addColorStop(0, col);
-            glow.addColorStop(1, 'transparent');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(0, 0, size * 2.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            // 4-point star shape
-            const starColor = s.isGold ? `rgba(240,216,147,${alpha})` : `rgba(255,255,255,${alpha})`;
-            ctx.fillStyle = starColor;
-            ctx.beginPath();
-            ctx.moveTo(0, -size);
-            ctx.quadraticCurveTo(size * 0.15, -size * 0.15, size, 0);
-            ctx.quadraticCurveTo(size * 0.15,  size * 0.15, 0, size);
-            ctx.quadraticCurveTo(-size * 0.15, size * 0.15, -size, 0);
-            ctx.quadraticCurveTo(-size * 0.15, -size * 0.15, 0, -size);
-            ctx.closePath();
-            ctx.fill();
-            ctx.restore();
-
-          } else {
-            // Small round star with soft glow
-            const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 4);
-            const base = s.isGold ? `rgba(212,175,55,` : `rgba(255,255,255,`;
-            grad.addColorStop(0,   base + alpha + ')');
-            grad.addColorStop(0.4, base + (alpha * 0.4) + ')');
-            grad.addColorStop(1,   base + '0)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(sx, sy, r * 4, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        });
-
-        requestAnimationFrame(draw);
-      }
-
       requestAnimationFrame(draw);
-    })();
-  </script>
+    }
+    requestAnimationFrame(draw);
+  })();
 
+  // ── Open directory ──
+  openDirBtn.addEventListener('click', () => {
+    coverPage.style.display = 'none';
+    innerSection.style.display = 'block';
+    isOpen = true;
+    loadData();
+  });
+
+  // ── Load data from Sheet ──
+  async function loadData() {
+    listingsWrap.innerHTML = '<div class="empty-state"><p>Summoning the community...</p></div>';
+    try {
+      const res = await fetch(SHEET_CSV_URL);
+      const text = await res.text();
+      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+      allMembers = parsed.data
+        .filter(r => r['Name'] && r['Name'].trim())
+        .map(parseRow)
+        .sort((a, b) => a.name.localeCompare(b.name));
+      filteredMembers = allMembers;
+      currentPage = 0;
+      renderPage();
+    } catch(e) {
+      listingsWrap.innerHTML = '<div class="empty-state"><p>Couldn\'t reach the directory — check the CSV URL.</p></div>';
+    }
+  }
+
+  function parseRow(r) {
+    let websites = [], socials = [];
+    try { websites = JSON.parse(r['Websites'] || '[]'); } catch(e) {}
+    try { socials   = JSON.parse(r['Socials']  || '[]'); } catch(e) {}
+    return {
+      name:     (r['Name']          || '').trim(),
+      nickname: (r['Nickname']      || '').trim(),
+      offer:    (r['What You Offer']|| '').trim(),
+      photo1:   (r['Photo1']        || '').trim(),
+      photo2:   (r['Photo2']        || '').trim(),
+      websites: websites.filter(w => w.type || w.url).sort((a,b) => (a.type||'').localeCompare(b.type||'')),
+      socials:  socials.filter(s => s.type || s.handle).sort((a,b) => (a.type||'').localeCompare(b.type||'')),
+    };
+  }
+
+  function buildSocialUrl(s) {
+    const h = (s.handle || '').trim();
+    if (!h) return '#';
+    if (h.startsWith('http') || h.startsWith('www.')) return h.startsWith('www.') ? 'https://'+h : h;
+    const slug = h.replace('@','');
+    const p = (s.type || '').toLowerCase();
+    if (p.includes('instagram'))  return `https://instagram.com/${slug}`;
+    if (p.includes('tiktok'))     return `https://tiktok.com/@${slug}`;
+    if (p.includes('facebook'))   return `https://facebook.com/${slug}`;
+    if (p.includes('pinterest'))  return `https://pinterest.com/${slug}`;
+    if (p.includes('youtube'))    return `https://youtube.com/@${slug}`;
+    if (p.includes('twitter') || p.includes('x')) return `https://x.com/${slug}`;
+    if (p.includes('threads'))    return `https://threads.net/@${slug}`;
+    if (p.includes('linkedin'))   return `https://linkedin.com/in/${slug}`;
+    return '#';
+  }
+
+  function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Render current page ──
+  function renderPage(direction) {
+    const total = filteredMembers.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const start = currentPage * PAGE_SIZE;
+    const end   = Math.min(start + PAGE_SIZE, total);
+    const pageMembers = filteredMembers.slice(start, end);
+
+    // Animate
+    if (direction) {
+      dirPage.classList.remove('page-flip-forward','page-flip-back');
+      void dirPage.offsetWidth;
+      dirPage.classList.add(direction === 'forward' ? 'page-flip-forward' : 'page-flip-back');
+    }
+
+    // Results info
+    const query = searchInput.value.trim();
+    if (query) {
+      resultsCount.textContent = `${total} result${total !== 1 ? 's' : ''} for "${query}"`;
+      clearSearchBtn.classList.add('visible');
+    } else {
+      resultsCount.textContent = `${total} member${total !== 1 ? 's' : ''} in the community`;
+      clearSearchBtn.classList.remove('visible');
+    }
+
+    // Section label / page badge
+    sectionLabel.textContent = query ? 'Search Results' : 'Community Members';
+    pageNumberBadge.textContent = `Page ${currentPage + 1} of ${totalPages}`;
+    pageCounter.textContent = `${currentPage + 1} / ${totalPages}`;
+
+    // Nav
+    prevBtn.disabled = currentPage === 0;
+    nextBtn.disabled = currentPage >= totalPages - 1;
+
+    // Listings
+    if (total === 0) {
+      listingsWrap.innerHTML = '<div class="empty-state"><p>No members match — try a different search.</p></div>';
+      return;
+    }
+
+    listingsWrap.innerHTML = pageMembers.map(m => buildListing(m)).join('');
+  }
+
+  function buildListing(m) {
+    // Photos
+    const photos = [m.photo1, m.photo2].filter(Boolean);
+    const photosHtml = photos.length ? `
+      <div class="listing-photos">
+        ${photos.map(p => `<img class="listing-photo" src="${esc(p)}" alt="Photo" onerror="this.style.display='none'" />`).join('')}
+      </div>` : '';
+
+    // Website pills
+    const webPills = m.websites.map(w => {
+      const url = w.url ? (w.url.startsWith('http') ? w.url : 'https://'+w.url) : '#';
+      return `<a class="listing-pill web" href="${esc(url)}" target="_blank" rel="noopener">
+        <i class="fa-solid fa-globe" style="font-size:0.65rem;"></i>${esc(w.type || 'Site')}
+      </a>`;
+    }).join('');
+
+    // Social pills
+    const socialPills = m.socials.map(s => {
+      const url = buildSocialUrl(s);
+      const iconClass = SOCIAL_ICONS[(s.type||'').toLowerCase()];
+      const iconHtml = iconClass ? `<i class="${iconClass}" style="font-size:0.7rem;"></i>` : '';
+      return `<a class="listing-pill social" href="${esc(url)}" target="_blank" rel="noopener">${iconHtml}${esc(s.type || 'Social')}</a>`;
+    }).join('');
+
+    const allPills = webPills + socialPills;
+    const hasOffer = m.offer && m.offer !== 'Socials only';
+
+    return `
+      <div class="listing">
+        ${photosHtml}
+        <div class="listing-body">
+          <div class="listing-name">${esc(m.name)}</div>
+          ${m.nickname ? `<span class="listing-known-as">✦ ${esc(m.nickname)}</span>` : ''}
+          ${hasOffer ? `<div class="listing-offer">${esc(m.offer)}</div>` : ''}
+          ${allPills ? `<div class="listing-links">${allPills}</div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  // ── Navigation ──
+  nextBtn.addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredMembers.length / PAGE_SIZE);
+    if (currentPage < totalPages - 1) {
+      currentPage++;
+      renderPage('forward');
+      dirPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  prevBtn.addEventListener('click', () => {
+    if (currentPage > 0) {
+      currentPage--;
+      renderPage('back');
+      dirPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // Go back to cover
+      innerSection.style.display = 'none';
+      coverPage.style.display = 'flex';
+    }
+  });
+
+  // ── Search ──
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    searchClearBtn.classList.toggle('visible', !!q);
+    filteredMembers = q
+      ? allMembers.filter(m => `${m.name} ${m.nickname} ${m.offer}`.toLowerCase().includes(q))
+      : allMembers;
+    currentPage = 0;
+    renderPage('forward');
+  });
+
+  function clearSearch() {
+    searchInput.value = '';
+    searchClearBtn.classList.remove('visible');
+    filteredMembers = allMembers;
+    currentPage = 0;
+    renderPage('forward');
+  }
+
+  searchClearBtn.addEventListener('click', clearSearch);
+  clearSearchBtn.addEventListener('click', clearSearch);
+</script>
 </body>
 </html>
