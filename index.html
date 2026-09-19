@@ -43,15 +43,29 @@
       align-items: center;
     }
 
+    body > *:not(#bgStarCanvas) { position: relative; z-index: 1; }
+
     .book-wrap {
       width: 100%;
       max-width: 700px;
+      perspective: 1000px;
     }
 
     /* ─────────────────────────────── COVER ─── */
     #coverPage {
       min-height: 100vh;
       background: radial-gradient(ellipse at 30% 20%, #5A0090 0%, #2E0058 35%, #1A0033 70%, #0D001E 100%);
+      transform: perspective(1000px) rotateY(-2.5deg) rotateX(0.4deg);
+      box-shadow:
+        /* Page depth strips on right */
+        6px 0 0 #1A0030,
+        12px 2px 0 #110022,
+        18px 4px 0 #0A0016,
+        /* Elevation shadow */
+        22px 28px 50px rgba(0,0,0,0.9),
+        /* Purple ambient glow */
+        -4px 4px 35px rgba(90,0,160,0.45),
+        0 0 60px rgba(80,0,150,0.2);
       position: relative;
       overflow: hidden;
       display: flex;
@@ -124,9 +138,10 @@
       color: #F0D893;
       letter-spacing: 0.015em;
       text-shadow:
-        0 0 18px rgba(160, 80, 255, 0.9),
-        0 0 40px rgba(120, 40, 220, 0.6),
-        0 0 70px rgba(100, 20, 200, 0.35),
+        0 0 18px rgba(160, 80, 255, 0.97),
+        0 0 40px rgba(120, 40, 220, 0.68),
+        0 0 70px rgba(100, 20, 200, 0.42),
+        0 0 100px rgba(80, 0, 200, 0.22),
         0 3px 6px rgba(0, 0, 0, 0.6);
     }
 
@@ -149,20 +164,6 @@
     }
 
     /* Community blurb on cover */
-    .cover-blurb {
-      max-width: 520px;
-      text-align: center;
-      color: rgba(220,185,255,0.75);
-      font-size: clamp(0.75rem, 2vw, 0.88rem);
-      line-height: 1.7;
-      margin-bottom: 22px;
-    }
-
-    .cover-blurb strong {
-      color: var(--gold-light);
-      font-weight: 600;
-    }
-
     /* Cover CTA buttons */
     .cover-btns {
       display: flex;
@@ -526,8 +527,38 @@
       font-size: 0.77rem;
       color: var(--inner-text-dim);
       line-height: 1.55;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
+
+    .listing-offer-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.55;
+    }
+
+    .listing-offer-text.expanded {
+      display: block;
+      overflow: visible;
+      -webkit-line-clamp: unset;
+    }
+
+    .see-toggle {
+      background: none;
+      border: none;
+      color: rgba(228,102,28,0.85);
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 2px 0 8px;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.04em;
+      display: none;
+    }
+
+    .see-toggle.visible { display: inline-block; }
+    .see-toggle:hover { color: #E4661C; }
 
     .listing-links {
       display: flex;
@@ -667,14 +698,6 @@
     </div>
 
     <div class="cover-rule"></div>
-
-    <p class="cover-blurb">
-      <strong>Welcome to The Divine Spotlight.</strong><br>
-      This is our place to connect, collaborate, and celebrate one another.
-      Fill out this quick form so fellow members can discover your business,
-      follow your journey, and support what you create.
-      Together, we're building a community where every connection helps another dream grow. ✦
-    </p>
 
     <div class="cover-btns">
       <a href="submit.html" class="cover-btn-gold">✦ Get Listed</a>
@@ -993,6 +1016,23 @@ function socialUrl(s){
 
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+// Show "See more" only when text is actually clamped
+function checkClamps() {
+  document.querySelectorAll('.listing-offer-text').forEach(el => {
+    const btn = el.nextElementSibling;
+    if (btn && btn.classList.contains('see-toggle')) {
+      btn.classList.toggle('visible', el.scrollHeight > el.clientHeight + 2);
+    }
+  });
+}
+
+window.toggleOffer = function(btn) {
+  const text = btn.previousElementSibling;
+  const expanded = text.classList.toggle('expanded');
+  btn.textContent = expanded ? 'See less ▴' : 'See more ▾';
+  btn.setAttribute('aria-expanded', expanded);
+};
+
 // ── Render ──
 function renderPage(dir){
   const total=filtered.length;
@@ -1025,6 +1065,8 @@ function renderPage(dir){
   }
 
   listingsWrap.innerHTML = members.map(buildListing).join('');
+  // Check after browser has painted (needed for scrollHeight to be accurate)
+  requestAnimationFrame(checkClamps);
 }
 
 function buildListing(m){
@@ -1049,7 +1091,7 @@ function buildListing(m){
     <div class="listing-body">
       <div class="listing-name">${esc(m.name)}</div>
       ${m.nickname?`<span class="listing-nickname">✦ ${esc(m.nickname)}</span>`:''}
-      ${hasOffer?`<div class="listing-offer">${esc(m.offer)}</div>`:''}
+      ${hasOffer?`<div class="listing-offer"><div class="listing-offer-text" id="offer-${esc(m.email||m.name.replace(/\s/g,''))}">${esc(m.offer)}</div><button class="see-toggle" onclick="toggleOffer(this)" aria-expanded="false">See more ▾</button></div>`:''}
       ${(webPills||socPills)?`<div class="listing-links">${webPills}${socPills}</div>`:''}
     </div>
   </div>`;
@@ -1083,5 +1125,115 @@ function clearSearch(){
 searchX.addEventListener('click',clearSearch);
 clearBtn.addEventListener('click',clearSearch);
 </script>
+
+  <script>
+  // ── Full-page persistent star & shooting-star canvas ──
+  (function(){
+    const c = document.createElement('canvas');
+    c.id = 'bgStarCanvas';
+    c.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
+    document.body.insertBefore(c, document.body.firstChild);
+    const ctx = c.getContext('2d');
+    const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
+    resize(); window.addEventListener('resize', resize);
+
+    // Multicolor stars: gold, purple, blue, white
+    const COLS = [
+      'rgba(212,175,55,',   // gold
+      'rgba(180,100,255,',  // purple
+      'rgba(110,160,255,',  // blue
+      'rgba(255,255,255,',  // white
+      'rgba(230,170,255,',  // lavender
+    ];
+
+    const stars = Array.from({length:180}, () => ({
+      x: Math.random(), y: Math.random(),
+      r: 0.25 + Math.random() * 0.85,
+      isDiamond: Math.random() < 0.07,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.18 + Math.random() * 0.55,
+      col: COLS[Math.floor(Math.random() * COLS.length)],
+    }));
+
+    let shooters = [], nextSpawn = 0.6, last = 0;
+
+    function newShooter() {
+      const fromTop = Math.random() < 0.55;
+      return {
+        x: fromTop ? Math.random() * 0.75 : -0.05,
+        y: fromTop ? -0.02 : Math.random() * 0.35,
+        vx: 0.0028 + Math.random() * 0.0022,
+        vy: 0.0018 + Math.random() * 0.0016,
+        len: 0.14 + Math.random() * 0.13,
+        life: 0, maxLife: 0.75 + Math.random() * 0.65,
+        w: 1.6 + Math.random() * 1.8,
+      };
+    }
+
+    function draw(ts) {
+      const dt = Math.min((ts - last) / 1000, 0.05); last = ts;
+      ctx.clearRect(0, 0, c.width, c.height);
+
+      // Stars
+      stars.forEach(s => {
+        s.phase += dt * s.speed;
+        const tw = 0.45 + 0.55 * (1 + Math.sin(s.phase)) * 0.5;
+        const al = 0.1 + tw * 0.5;
+        const sx = s.x * c.width, sy = s.y * c.height;
+        if (s.isDiamond) {
+          const sz = s.r * 3.5;
+          ctx.save(); ctx.translate(sx, sy);
+          ctx.rotate(Math.PI / 4 * Math.sin(s.phase * 0.4));
+          ctx.fillStyle = s.col + al + ')';
+          ctx.beginPath();
+          ctx.moveTo(0,-sz); ctx.quadraticCurveTo(sz*.14,-sz*.14,sz,0);
+          ctx.quadraticCurveTo(sz*.14,sz*.14,0,sz);
+          ctx.quadraticCurveTo(-sz*.14,sz*.14,-sz,0);
+          ctx.quadraticCurveTo(-sz*.14,-sz*.14,0,-sz);
+          ctx.closePath(); ctx.fill(); ctx.restore();
+        } else {
+          const g = ctx.createRadialGradient(sx,sy,0,sx,sy,s.r*5);
+          g.addColorStop(0, s.col + al + ')');
+          g.addColorStop(1, s.col + '0)');
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(sx,sy,s.r*5,0,Math.PI*2); ctx.fill();
+        }
+      });
+
+      // Shooting stars
+      nextSpawn -= dt;
+      if (nextSpawn <= 0) { shooters.push(newShooter()); nextSpawn = 1.4 + Math.random() * 2.2; }
+      shooters = shooters.filter(sh => sh.life < sh.maxLife);
+      shooters.forEach(sh => {
+        sh.life += dt;
+        const p = sh.life / sh.maxLife;
+        const fade = p < 0.15 ? p / 0.15 : p > 0.72 ? 1 - (p - 0.72) / 0.28 : 1;
+        const hx = sh.x * c.width, hy = sh.y * c.height;
+        const tx = hx - sh.vx * c.width  * 55 * sh.len;
+        const ty = hy - sh.vy * c.height * 55 * sh.len;
+        sh.x += sh.vx * dt; sh.y += sh.vy * dt;
+
+        const grd = ctx.createLinearGradient(tx,ty,hx,hy);
+        grd.addColorStop(0,   'rgba(212,175,55,0)');
+        grd.addColorStop(0.3, `rgba(150,70,240,${0.65*fade})`);
+        grd.addColorStop(0.7, `rgba(210,180,255,${0.88*fade})`);
+        grd.addColorStop(1,   `rgba(255,242,165,${fade})`);
+
+        ctx.save();
+        ctx.strokeStyle = grd; ctx.lineWidth = sh.w * fade; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(hx,hy); ctx.stroke();
+
+        const tg = ctx.createRadialGradient(hx,hy,0,hx,hy,6);
+        tg.addColorStop(0, `rgba(255,248,200,${fade})`);
+        tg.addColorStop(1, 'rgba(255,248,200,0)');
+        ctx.fillStyle = tg; ctx.beginPath(); ctx.arc(hx,hy,6,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+      });
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+  </script>
+
 </body>
 </html>
