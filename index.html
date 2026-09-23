@@ -550,21 +550,6 @@
       border-radius: 2px;
     }
 
-    .listing-photos {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      flex-shrink: 0;
-    }
-
-    .listing-photo {
-      width: 56px; height: 56px;
-      object-fit: cover;
-      border-radius: 3px;
-      border: 1px solid rgba(212,175,55,0.22);
-      background: var(--inner-surface-2);
-    }
-
     .listing-body { flex: 1; min-width: 0; }
 
     .listing-name {
@@ -956,8 +941,6 @@ function parseRow(r){
     nickname:(r['Nickname']||'').trim(),
     email:   (r['Email']||'').trim(),
     offer:   (r['What You Offer']||'').trim(),
-    photo1:  (r['Photo1']||'').trim(),
-    photo2:  (r['Photo2']||'').trim(),
     websites: websites.filter(w=>w.type||w.url).sort((a,b)=>(a.type||'').localeCompare(b.type||'')),
     socials:  socials.filter(s=>s.type||s.handle).sort((a,b)=>(a.type||'').localeCompare(b.type||'')),
   };
@@ -1035,9 +1018,6 @@ function renderPage(dir){
 }
 
 function buildListing(m){
-  const photos=[m.photo1,m.photo2].filter(Boolean);
-  const photoHtml = photos.length ? `<div class="listing-photos">${photos.map(p=>`<img class="listing-photo" src="${esc(p)}" alt="" onerror="this.style.display='none'"/>`).join('')}</div>` : '';
-
   const webPills = m.websites.map(w=>{
     const url=w.url?(w.url.startsWith('http')?w.url:'https://'+w.url):'#';
     return `<a class="lpill web" href="${esc(url)}" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i>${esc(w.type||'Site')}</a>`;
@@ -1052,7 +1032,6 @@ function buildListing(m){
   const hasOffer = m.offer && m.offer!=='Socials only';
 
   return `<div class="listing">
-    ${photoHtml}
     <div class="listing-body">
       <div class="listing-name">${esc(m.name)}</div>
       ${m.nickname?`<span class="listing-nickname">✦ ${esc(m.nickname)}</span>`:''}
