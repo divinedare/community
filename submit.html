@@ -673,15 +673,6 @@
             <textarea id="whatYouOffer" name="whatYouOffer" placeholder="e.g. Digital products, DTF prints, embroidery, sublimation, custom cups & tumblers, 3D printing, vinyl decals, screen printing, handmade jewelry, candles, crochet, resin art, laser engraving, stickers, clothing..."></textarea>
             <p class="muted">Just list what you make or sell — a few words or a sentence is perfect.</p>
           </div>
-          <div>
-            <label for="photo1">Profile Photo URL 1 <span style="font-weight:400;color:var(--muted);font-size:0.85rem;">(optional)</span></label>
-            <input type="text" id="photo1" name="photo1" placeholder="https://i.imgur.com/yourimage.jpg" />
-            <p class="muted" style="margin-top:5px;">Paste a public direct image link. Google Drive tip: Share the image → Get link → right-click the preview → Copy image address.</p>
-          </div>
-          <div>
-            <label for="photo2">Profile Photo URL 2 <span style="font-weight:400;color:var(--muted);font-size:0.85rem;">(optional)</span></label>
-            <input type="text" id="photo2" name="photo2" placeholder="https://i.imgur.com/anotherimage.jpg" />
-          </div>
         </div>
       </section>
 
@@ -1112,8 +1103,6 @@
         nickname:     document.getElementById('nickname').value.trim(),
         email: emailInput.value.trim(),
         whatYouOffer: offerInput.value.trim(),
-        photo1:       document.getElementById('photo1').value.trim(),
-        photo2:       document.getElementById('photo2').value.trim(),
         websites: Array.from(document.querySelectorAll('.website-row')).map(row => ({
           type: row.querySelector('select')?.value || '',
           url: row.querySelector('input')?.value.trim() || ''
