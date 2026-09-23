@@ -624,8 +624,8 @@
     <div id="successPage">
       <div class="success-page-inner">
         <span class="star">✦</span>
-        <h2>You're in the Spotlight!</h2>
-        <p>Tuned In. Tapped In. Turned On. Your listing is officially part of the magic — the Universe (and the rest of the community) just got the memo.</p>
+        <h2>Submission Sent ✦</h2>
+        <p>Your listing request was sent. Please check the directory in a few minutes to confirm it appeared. If you do not see it, contact the directory owner before submitting again.</p>
         <p>As always, I love each and every one of you. You can make money, but you can't make time — the fact that you're here building this with us means everything. Love yourself, love everyone else, and have fun doing it. See you soon! ✦</p>
         <div class="success-actions">
           <a href="https://divinedare.github.io/community/" class="btn-gold">View the Member Directory</a>
@@ -1136,13 +1136,14 @@
       }
 
       try {
-        const res = await fetch(FORM_ENDPOINT_URL, {
+        // Apps Script redirects its reply across origins. The browser cannot
+        // read that reply, even when the sheet has already received the row.
+        await fetch(FORM_ENDPOINT_URL, {
           method: 'POST',
+          mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(data)
         });
-
-        if (!res.ok) throw new Error('Submit failed');
 
         formWrap.style.display = 'none';
         successPage.style.display = 'flex';
@@ -1153,7 +1154,7 @@
         whatYouOffer.style.pointerEvents = 'auto';
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err) {
-        errorMessage.innerHTML = 'Something went sideways on submit. Check your endpoint URL and try again.';
+        errorMessage.textContent = 'We could not confirm the request was sent. Check the directory before retrying, so you do not create a duplicate listing.';
         errorMessage.style.display = 'block';
       }
     });
