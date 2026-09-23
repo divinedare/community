@@ -46,11 +46,11 @@
     /* Hero */
     .hero {
       position: relative;
-      background: linear-gradient(135deg, rgba(228,102,28,0.16), rgba(111,143,224,0.18) 55%, rgba(79,124,255,0.14));
-      border: 1px solid var(--border);
+      background: rgba(6, 0, 16, 0.92);
+      border: 1px solid rgba(228,102,28,0.4);
       border-radius: 28px;
       padding: 34px 32px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow), 0 0 40px rgba(0,0,0,0.6);
       margin-bottom: 26px;
       overflow: hidden;
     }
@@ -88,7 +88,15 @@
       font-size: 1rem;
     }
 
-    .hero p:last-child { margin-bottom: 0; }
+    .hero p:last-child {
+      margin-bottom: 0;
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(1rem, 2.5vw, 1.15rem);
+      color: var(--gold-light);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-top: 10px;
+    }
 
     /* Card */
     form { display: grid; gap: 22px; }
@@ -388,8 +396,8 @@
     /* ── Purple Pages global override ── */
     :root {
       --bg: #0D001E;
-      --panel: rgba(18, 0, 38, 0.88);
-      --panel-2: rgba(24, 0, 50, 0.92);
+      --panel: rgba(10, 0, 22, 0.94);
+      --panel-2: rgba(14, 0, 30, 0.96);
       --text: #E8D0FF;
       --muted: #B89ACC;
       --border: rgba(228,102,28,0.22);
@@ -476,8 +484,9 @@
 
     /* Section heading / page title */
     .hero, .hero-section {
-      background: linear-gradient(135deg, rgba(228,102,28,0.12), rgba(100,40,200,0.18)) !important;
-      border: 1px solid var(--border) !important;
+      background: rgba(4, 0, 12, 0.75) !important;
+      border: 1px solid rgba(228,102,28,0.45) !important;
+      box-shadow: 0 0 0 1px rgba(228,102,28,0.1), 0 20px 50px rgba(0,0,0,0.7) !important;
     }
 
     .hero h1, .hero .h1 {
@@ -521,8 +530,27 @@
     }
 
     /* Back link */
-    .back-link { color: var(--muted) !important; }
-    .back-link:hover { color: var(--gold) !important; }
+    .back-link {
+      color: var(--gold) !important;
+      font-family: 'Cinzel', serif !important;
+      font-weight: 700 !important;
+      font-size: 0.85rem !important;
+      letter-spacing: 0.06em !important;
+      text-decoration: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      padding: 8px 16px !important;
+      border: 1px solid rgba(228,102,28,0.35) !important;
+      border-radius: 20px !important;
+      background: rgba(228,102,28,0.08) !important;
+      transition: all 0.15s ease !important;
+    }
+    .back-link:hover {
+      background: rgba(228,102,28,0.16) !important;
+      border-color: var(--gold) !important;
+      transform: translateY(-1px) !important;
+    }
 
     /* Remove box button / btn-danger */
     .btn-danger {
@@ -561,9 +589,6 @@
     <section class="hero">
       <p class="tagline">The Divine Spotlight ✦ Community Directory</p>
       <h1>Get Listed in the Directory</h1>
-      <p>
-        This is our place to connect, collaborate, and celebrate one another. Fill out this quick form so fellow members can find your business, follow you on socials, and support what you create.
-      </p>
       <p>
         Every connection helps another dream grow. ✦
       </p>

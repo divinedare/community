@@ -243,8 +243,8 @@
     /* ── Purple Pages global override ── */
     :root {
       --bg: #0D001E;
-      --panel: rgba(18, 0, 38, 0.88);
-      --panel-2: rgba(24, 0, 50, 0.92);
+      --panel: rgba(10, 0, 22, 0.94);
+      --panel-2: rgba(14, 0, 30, 0.96);
       --text: #E8D0FF;
       --muted: #B89ACC;
       --border: rgba(228,102,28,0.22);
@@ -376,8 +376,27 @@
     }
 
     /* Back link */
-    .back-link { color: var(--muted) !important; }
-    .back-link:hover { color: var(--gold) !important; }
+    .back-link {
+      color: var(--gold) !important;
+      font-family: 'Cinzel', serif !important;
+      font-weight: 700 !important;
+      font-size: 0.85rem !important;
+      letter-spacing: 0.06em !important;
+      text-decoration: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      padding: 8px 16px !important;
+      border: 1px solid rgba(228,102,28,0.35) !important;
+      border-radius: 20px !important;
+      background: rgba(228,102,28,0.08) !important;
+      transition: all 0.15s ease !important;
+    }
+    .back-link:hover {
+      background: rgba(228,102,28,0.16) !important;
+      border-color: var(--gold) !important;
+      transform: translateY(-1px) !important;
+    }
 
     /* Remove box button / btn-danger */
     .btn-danger {
