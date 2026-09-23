@@ -347,15 +347,77 @@
     /* Sticky header */
     .inner-header {
       background: linear-gradient(90deg, #1E0038 0%, #380068 50%, #1E0038 100%);
-      padding: 10px 14px;
+      padding: 12px 14px 10px;
       display: flex;
-      gap: 10px;
-      align-items: center;
+      flex-direction: column;
+      gap: 9px;
       position: sticky;
       top: 0;
       z-index: 60;
       box-shadow: 0 2px 12px rgba(0,0,0,0.5);
       border-bottom: 1px solid rgba(212,175,55,0.2);
+    }
+
+    .directory-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .directory-action {
+      min-height: 48px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.72rem, 2.4vw, 0.9rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1.25;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s, color 0.2s;
+    }
+
+    .directory-action-primary {
+      background: #D4AF37;
+      border: 1px solid #D4AF37;
+      color: #1A0033;
+    }
+
+    .directory-action-secondary {
+      background: rgba(20,0,42,0.7);
+      border: 1px solid rgba(212,175,55,0.7);
+      color: var(--gold-light);
+    }
+
+    .directory-action-primary:hover,
+    .directory-action-primary:focus-visible {
+      background: #F0D893;
+      border-color: #F0D893;
+      box-shadow: 0 0 22px rgba(240,216,147,0.65);
+      transform: translateY(-2px);
+    }
+
+    .directory-action-secondary:hover,
+    .directory-action-secondary:focus-visible {
+      background: rgba(212,175,55,0.18);
+      border-color: #F0D893;
+      color: #FFF0BD;
+      box-shadow: 0 0 22px rgba(212,175,55,0.5);
+      transform: translateY(-2px);
+    }
+
+    .directory-action:focus-visible { outline: 2px solid #FFF0BD; outline-offset: 3px; }
+
+    .header-main {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
     }
 
     .header-home-btn {
@@ -380,7 +442,7 @@
     .header-home-btn:hover { opacity: 0.75; }
     .header-home-btn .home-icon { font-size: 0.8rem; opacity: 0.7; }
 
-    .header-search-wrap { flex: 1; position: relative; }
+    .header-search-wrap { flex: 1; min-width: 0; position: relative; }
 
     .header-search {
       width: 100%;
@@ -678,6 +740,8 @@
       .cover-main { padding: 30px 18px 16px; }
       .cover-btns { gap: 10px; }
       .cover-btn-gold, .cover-btn-outline { font-size: 0.72rem; padding: 10px 18px; }
+      .directory-actions { gap: 8px; }
+      .directory-action { font-size: 0.66rem; letter-spacing: 0.03em; padding: 8px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -752,17 +816,23 @@
 <!-- ══════════════════ INNER DIRECTORY ══════════════════ -->
 <div id="innerSection">
 
-  <!-- Sticky header -->
-  <div class="inner-header">
-    <button class="header-home-btn" id="homeBtn" aria-label="Return to cover">
-      <span class="home-icon">◈</span>
-      Purple Pages
-    </button>
-    <div class="header-search-wrap">
-      <input class="header-search" id="searchInput" type="text" placeholder="Search by name, craft, or offer..." autocomplete="off"/>
-      <button class="search-x" id="searchX" aria-label="Clear search">✕</button>
+    <!-- Sticky header -->
+    <div class="inner-header">
+      <nav class="directory-actions" aria-label="Directory listing actions">
+        <a class="directory-action directory-action-primary" href="submit.html">✦ Get Listed</a>
+        <a class="directory-action directory-action-secondary" href="manage.html">Manage My Listing</a>
+      </nav>
+      <div class="header-main">
+        <button class="header-home-btn" id="homeBtn" aria-label="Return to cover">
+          <span class="home-icon">◈</span>
+          Purple Pages
+        </button>
+        <div class="header-search-wrap">
+          <input class="header-search" id="searchInput" type="text" placeholder="Search by name, craft, or offer..." autocomplete="off"/>
+          <button class="search-x" id="searchX" aria-label="Clear search">✕</button>
+        </div>
+      </div>
     </div>
-  </div>
 
   <!-- Directory page (content swapped per page) -->
   <div class="dir-page" id="dirPage">

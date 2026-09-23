@@ -219,169 +219,253 @@
   </style>
 
   <style>
-    /* ── Purple Pages global override ── */
+    /* The book's gold, lavender and deep purple palette is shared by both forms. */
     :root {
       --bg: #0D001E;
-      --panel: rgba(10, 0, 22, 0.94);
-      --panel-2: rgba(14, 0, 30, 0.96);
+      --panel: rgba(20, 0, 42, 0.91);
+      --panel-2: rgba(31, 0, 64, 0.88);
       --text: #E8D0FF;
       --muted: #B89ACC;
-      --border: rgba(228,102,28,0.22);
-      --gold: #E4661C;
-      --gold-light: #F5A06B;
-      --shadow: 0 16px 44px rgba(0,0,0,0.55);
-      --radius: 6px;
+      --gold: #D4AF37;
+      --gold-deep: #AE8625;
+      --gold-light: #F0D893;
+      --border: rgba(212, 175, 55, 0.28);
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.48);
+      --radius: 10px;
     }
 
     body {
-      background-image: url('assets/add-background.jpg') !important;
-      background-size: cover !important;
-      background-position: center center !important;
-      background-attachment: fixed !important;
-      background-color: #0D001E !important;
+      background: #0D001E url('assets/add-background.jpg') center / cover fixed no-repeat;
+      color: var(--text);
       font-family: 'Montserrat', sans-serif;
-      color: var(--text) !important;
     }
 
+    .wrap { max-width: 700px; padding: 28px 18px 64px; }
 
-    /* Card headers */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 9px 15px;
+      background: rgba(20, 0, 42, 0.78);
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      border-radius: 9px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      color: var(--gold-light);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-decoration: none;
+      transition: color 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .back-link:hover, .back-link:focus-visible {
+      color: #FFF0BD;
+      background: rgba(40, 0, 82, 0.94);
+      border-color: var(--gold-light);
+      box-shadow: 0 0 18px rgba(212, 175, 55, 0.3);
+      transform: none;
+    }
+    .back-link:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 3px; }
+
+    .hero {
+      padding: 32px 26px;
+      margin-bottom: 24px;
+      background: rgba(20, 0, 42, 0.84);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .hero::after { content: none; }
+    .hero .star {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--gold);
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+    .hero .tagline {
+      display: block;
+      margin: 0 0 10px;
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      margin: 0 0 10px;
+      color: var(--gold-light);
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.55rem, 4vw, 2.15rem);
+      line-height: 1.25;
+      letter-spacing: 0.03em;
+      text-shadow: none;
+    }
+    .hero p, .hero p:last-child {
+      margin: 0;
+      color: var(--muted);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.96rem;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 1.7;
+    }
+
+    .card {
+      margin-bottom: 0;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
     .card-header {
-      background: linear-gradient(90deg, rgba(228,102,28,0.14), rgba(111,80,220,0.08)) !important;
-      border-bottom: 1px solid var(--border) !important;
+      padding: 16px 22px;
+      background: rgba(40, 0, 82, 0.76);
+      border-bottom: 1px solid var(--border);
     }
-
-    .card-header h2 {
-      font-family: 'Cinzel', serif !important;
-      color: var(--gold-light) !important;
+    .card-header h2, .step .card-header h2 {
+      margin: 0;
+      color: var(--gold-light);
+      font-family: 'Cinzel', serif;
+      font-size: 1.08rem;
       letter-spacing: 0.06em;
     }
-
-    /* Cards */
-    .card {
-      background: var(--panel) !important;
-      border: 1px solid var(--border) !important;
-      border-radius: var(--radius) !important;
-      box-shadow: var(--shadow) !important;
+    .card-body { padding: 20px 22px 24px; gap: 18px; }
+    label { color: var(--text); }
+    .muted, .found-listing p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
     }
 
-    /* Inputs */
     input[type="text"], input[type="email"], input[type="tel"],
-    textarea, select {
-      background: var(--panel-2) !important;
-      border: 1px solid var(--border) !important;
-      color: var(--text) !important;
-      border-radius: 6px !important;
+    textarea, select,
+    input[type="text"]:not(:placeholder-shown),
+    input[type="email"]:not(:placeholder-shown),
+    textarea:not(:placeholder-shown) {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
     }
-
-    input:not(:placeholder-shown), textarea:not(:placeholder-shown) {
-      background: rgba(255,255,255,0.06) !important;
-      color: #F0E6FF !important;
-    }
-
+    input[type="text"]::placeholder, input[type="email"]::placeholder,
+    textarea::placeholder { color: #A98CC2; opacity: 0.85; }
+    select option { background: #1F0040; color: var(--text); }
     input:focus, textarea:focus, select:focus {
-      border-color: var(--gold) !important;
-      box-shadow: 0 0 0 3px rgba(228,102,28,0.15) !important;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+    }
+    textarea { min-height: 110px; }
+    .dynamic-rows { display: grid; gap: 12px; }
+    .manage-row {
+      display: grid;
+      grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+      gap: 10px;
+      align-items: end;
     }
 
-    /* Primary button */
-    .primary, .btn-gold, button[type="submit"], button.primary {
-      background: linear-gradient(135deg, #E4661C, #C4550F) !important;
-      color: #0D001E !important;
-      font-family: 'Cinzel', serif !important;
-      font-weight: 700 !important;
-      letter-spacing: 0.06em !important;
-      border: none !important;
-      box-shadow: 0 6px 20px rgba(228,102,28,0.4) !important;
+    .primary, .btn-gold, .secondary, .btn-outline, button[type="submit"] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 22px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      line-height: 1.35;
     }
-
-    /* Outline button */
+    .primary, .btn-gold, button[type="submit"] {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      border: 1px solid var(--gold);
+      color: #1A0033;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
+      transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+    }
+    .primary:hover, .btn-gold:hover, button[type="submit"]:hover,
+    .primary:focus-visible, .btn-gold:focus-visible, button[type="submit"]:focus-visible {
+      background: #FFF0BD;
+      box-shadow: 0 0 23px rgba(240, 216, 147, 0.6);
+      transform: translateY(-2px);
+    }
     .secondary, .btn-outline {
-      background: transparent !important;
-      border: 1px solid rgba(228,102,28,0.4) !important;
-      color: var(--gold-light) !important;
+      background: rgba(20, 0, 42, 0.65);
+      border: 1px solid var(--border);
+      color: var(--gold-light);
+      transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+    }
+    .secondary:hover, .btn-outline:hover,
+    .secondary:focus-visible, .btn-outline:focus-visible {
+      border-color: var(--gold-light);
+      color: #FFF0BD;
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.32);
+      transform: translateY(-2px);
+    }
+    .actions { gap: 12px; margin-top: 12px; }
+    .btn-danger, .remove-btn {
+      background: rgba(46, 6, 30, 0.72);
+      border: 1px solid rgba(224, 90, 110, 0.5);
+      color: #FFB9C4;
     }
 
-    .secondary:hover, .btn-outline:hover {
-      border-color: var(--gold) !important;
+    .found-listing {
+      background: rgba(40, 0, 82, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .found-listing h3 { color: var(--gold-light); }
+    .confirm-delete {
+      background: rgba(70, 10, 36, 0.42);
+      border: 1px solid rgba(224, 90, 110, 0.42);
+      border-radius: 8px;
+    }
+    .msg.info { background: rgba(80, 45, 135, 0.4); border-color: rgba(180, 120, 255, 0.35); color: var(--text); }
+    .msg.success, .success, #successMessage {
+      background: rgba(40, 0, 82, 0.82);
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      animation: none;
+      box-shadow: 0 0 22px rgba(212, 175, 55, 0.18);
+    }
+    .error, .msg.error, #errorMessage {
+      background: rgba(100, 16, 45, 0.63);
+      border: 1px solid rgba(224, 90, 110, 0.5);
+      color: #FFD6DC;
+    }
+    .success-page-inner {
+      background: rgba(20, 0, 42, 0.94);
+      border: 1px solid var(--gold);
+      box-shadow: var(--shadow);
+      animation: none;
+    }
+    .success-page-inner .star { text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+    .success-page-inner p { color: var(--text); }
+    .success-page-inner h2 { color: var(--gold-light); text-shadow: none; }
+    .success-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .success-actions a { display: inline-block; text-decoration: none; }
+    .email-note {
+      margin-top: 6px;
+      padding: 9px 12px;
+      background: rgba(212, 175, 55, 0.1);
+      border-left: 3px solid var(--gold);
+      border-radius: 3px;
     }
 
-    /* Labels */
-    label { color: var(--text) !important; }
-
-    /* Section heading / page title */
-    .hero, .hero-section {
-      background: linear-gradient(135deg, rgba(228,102,28,0.12), rgba(100,40,200,0.18)) !important;
-      border: 1px solid var(--border) !important;
-    }
-
-    .hero h1, .hero .h1 {
-      font-family: 'Cinzel', serif !important;
-      color: var(--gold-light) !important;
-      text-shadow: 0 0 20px rgba(160,80,255,0.7), 0 0 40px rgba(120,40,220,0.4);
-    }
-
-    .hero .tagline {
-      font-family: 'Cinzel', serif !important;
-      color: rgba(228,102,28,0.75) !important;
-    }
-
-    /* Muted text */
-    .muted { color: var(--muted) !important; }
-
-    /* Success box */
-    .success, #successMessage {
-      background: linear-gradient(135deg, rgba(228,102,28,0.15), rgba(100,40,200,0.2)) !important;
-      border: 2px solid var(--gold) !important;
-      color: var(--gold-light) !important;
-    }
-
-    /* Error box */
-    .error, #errorMessage {
-      background: rgba(180,60,100,0.15) !important;
-      border: 1px solid rgba(180,60,100,0.4) !important;
-      color: #FFD0DC !important;
-    }
-
-    /* Pills / links */
-    .pill { 
-      background: rgba(228,102,28,0.08) !important;
-      border: 1px solid rgba(228,102,28,0.25) !important;
-      color: var(--gold-light) !important;
-    }
-
-    /* Step sections (manage page) */
-    .step .card-header h2 {
-      color: var(--gold-light) !important;
-    }
-
-    /* Back link */
-    .back-link {
-      color: var(--gold) !important;
-      font-family: 'Cinzel', serif !important;
-      font-weight: 700 !important;
-      font-size: 0.85rem !important;
-      letter-spacing: 0.06em !important;
-      text-decoration: none !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 6px !important;
-      padding: 8px 16px !important;
-      border: 1px solid rgba(228,102,28,0.35) !important;
-      border-radius: 20px !important;
-      background: rgba(228,102,28,0.08) !important;
-      transition: all 0.15s ease !important;
-    }
-    .back-link:hover {
-      background: rgba(228,102,28,0.16) !important;
-      border-color: var(--gold) !important;
-      transform: translateY(-1px) !important;
-    }
-
-    /* Remove box button / btn-danger */
-    .btn-danger {
-      border: 1px solid rgba(200,80,100,0.4) !important;
-      color: #FFB0C0 !important;
-      background: transparent !important;
+    @media (max-width: 640px) {
+      .hero { padding: 26px 20px; }
+      .card-body { padding: 18px; }
+      .dyn-row, .manage-row { grid-template-columns: 1fr; }
     }
   </style>
 
@@ -393,7 +477,8 @@
     <a href="index.html" class="back-link">← Back to Directory</a>
 
     <div class="hero">
-      <span class="star">✦</span>
+      <span class="star" aria-hidden="true">✦</span>
+      <p class="tagline">The Divine Spotlight ✦ Community Directory</p>
       <h1>Manage My Listing</h1>
       <p>Enter your name and email to find your listing. You can then update your info, add new websites or socials, or remove your listing entirely.</p>
     </div>
@@ -457,7 +542,7 @@
           <div>
             <label for="newEmail">New Email Address</label>
             <input type="email" id="newEmail" placeholder="Leave blank to keep current email" />
-            <p class="muted" style="margin-top:5px; padding:8px 12px; background:rgba(228,102,28,0.08); border-left:3px solid #E4661C; border-radius:3px;">
+            <p class="muted email-note">
               ⚠️ Important: After saving a new email, you must use your <strong>new email address</strong> to look up your listing next time. Make sure it is correct before submitting.
             </p>
           </div>
@@ -468,9 +553,11 @@
           <div>
             <label>Additional Websites to Add</label>
             <p class="muted" style="margin-bottom:10px;">These will be added to your existing websites, not replace them.</p>
-            <div id="updateWebsiteRows" style="display:grid;gap:10px;">
-              <div style="display:grid;grid-template-columns:minmax(180px,220px) 1fr;gap:10px;">
-                <select name="newWebsiteType">
+            <div id="updateWebsiteRows" class="dynamic-rows">
+              <div class="manage-row">
+                <div>
+                <label for="newWebsiteType">Website Type</label>
+                <select id="newWebsiteType" name="newWebsiteType">
                   <option value="">Select type</option>
                   <option>Website</option>
                   <option>Amazon Storefront</option>
@@ -482,16 +569,22 @@
                   <option>Stan Store</option>
                   <option>Other</option>
                 </select>
-                <input type="text" name="newWebsiteUrl" placeholder="https://example.com" />
+                </div>
+                <div>
+                  <label for="newWebsiteUrl">Website URL</label>
+                  <input type="text" id="newWebsiteUrl" name="newWebsiteUrl" placeholder="https://example.com" />
+                </div>
               </div>
             </div>
           </div>
           <div>
             <label>Additional Socials to Add</label>
             <p class="muted" style="margin-bottom:10px;">These will be added to your existing socials, not replace them.</p>
-            <div id="updateSocialRows" style="display:grid;gap:10px;">
-              <div style="display:grid;grid-template-columns:minmax(180px,220px) 1fr;gap:10px;">
-                <select name="newSocialType">
+            <div id="updateSocialRows" class="dynamic-rows">
+              <div class="manage-row">
+                <div>
+                <label for="newSocialType">Platform</label>
+                <select id="newSocialType" name="newSocialType">
                   <option value="">Select platform</option>
                   <option>Facebook</option>
                   <option>Facebook Group</option>
@@ -506,7 +599,11 @@
                   <option>YouTube</option>
                   <option>Other</option>
                 </select>
-                <input type="text" name="newSocialHandle" placeholder="@yourhandle or full URL" />
+                </div>
+                <div>
+                  <label for="newSocialHandle">Profile URL</label>
+                  <input type="text" id="newSocialHandle" name="newSocialHandle" placeholder="@yourhandle or full URL" />
+                </div>
               </div>
             </div>
           </div>
@@ -525,9 +622,9 @@
     <!-- Success state -->
     <div class="step" id="step4">
       <div class="msg success" style="display:block;" id="finalMsg"></div>
-      <div style="margin-top:20px;display:flex;gap:14px;flex-wrap:wrap;">
-        <a href="index.html" class="btn-gold" style="text-decoration:none;display:inline-block;padding:13px 24px;font-weight:800;border-radius:999px;font-family:'Montserrat',sans-serif;">View the Directory</a>
-        <a href="submit.html" class="btn-outline" style="text-decoration:none;display:inline-block;padding:13px 24px;font-weight:700;border-radius:999px;font-family:'Montserrat',sans-serif;border:1px solid var(--border);color:var(--text);">Back to Listing Form</a>
+      <div class="success-actions">
+        <a href="index.html" class="btn-gold">View the Directory</a>
+        <a href="submit.html" class="btn-outline">Back to Listing Form</a>
       </div>
     </div>
 
