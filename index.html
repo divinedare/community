@@ -454,8 +454,10 @@
       height: 100svh;
       min-height: 0;
       width: 100%;
+      max-width: min(1120px, 108svh);
+      margin-inline: auto;
       display: grid;
-      grid-template-rows: 29% minmax(0, 1fr) 20%;
+      grid-template-rows: 25% minmax(0, 1fr) 20%;
       overflow: hidden;
       background: #171237;
     }
@@ -470,19 +472,19 @@
       background-color: #171237;
       background-image: url('assets/cover-panels/header.webp'), url('assets/add-background.jpg');
       background-position: center, center;
-      background-size: 100% 220%, cover;
+      background-size: 100% auto, cover;
       background-repeat: no-repeat;
     }
 
     .cover-panel-middle {
-      background: #e7e6f4 url('assets/cover-panels/middle.webp') center / 100% 100% no-repeat;
+      background: #e7e6f4 url('assets/cover-panels/middle.webp') center / 100% auto no-repeat;
     }
 
     .cover-panel-footer {
       background-color: #171237;
       background-image: url('assets/cover-panels/footer.webp'), url('assets/add-background.jpg');
-      background-position: center, center;
-      background-size: 100% 261%, cover;
+      background-position: center 53%, center;
+      background-size: 100% auto, cover;
       background-repeat: no-repeat;
     }
 
@@ -523,7 +525,9 @@
     }
 
     @media (max-width: 640px) {
-      #coverPage { grid-template-rows: 17% minmax(0, 1fr) 19%; }
+      #coverPage { grid-template-rows: 14% minmax(0, 1fr) 14%; }
+      .cover-panel-header { background-size: auto 190%, cover; }
+      .cover-panel-footer { background-size: auto 210%, cover; }
       .cover-panel-middle {
         background-image: linear-gradient(rgba(245, 240, 251, .22), rgba(245, 240, 251, .18)), url('assets/cover-panels/middle.webp');
         background-position: center, center bottom;
