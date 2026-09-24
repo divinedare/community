@@ -715,22 +715,40 @@
 
     document.getElementById('backBtn').addEventListener('click', () => showStep('step2'));
 
+    // Apps Script redirects its response across origins. The request can succeed
+    // even when a normal browser fetch rejects the unreadable response.
+    async function sendToSheet(payload) {
+      await fetch(FORM_ENDPOINT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      // An opaque response cannot tell us whether Apps Script saved the change.
+    }
+
     // ── Delete: send removal request ──
     document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('confirmDeleteBtn');
+      btn.disabled = true;
       try {
-        await fetch(FORM_ENDPOINT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'delete',
-            email: (foundMember['Email'] || '').trim(),
-            name: (foundMember['Name'] || '').trim()
-          })
+        await sendToSheet({
+          action: 'delete',
+          email: (foundMember['Email'] || '').trim(),
+          name: (foundMember['Name'] || '').trim()
         });
-      } catch(e) {}
-
-      document.getElementById('finalMsg').innerHTML = '✦ Removal request received! Your listing will be removed from the directory within 24 hours. Thank you for being part of the spotlight — you\'re always welcome back!';
-      showStep('step4');
+        const message = document.getElementById('finalMsg');
+        message.className = 'msg info';
+        message.textContent = '✦ Your removal request was sent to the directory owner. It will stay visible until the owner removes it. If it is still there after 24 hours, please contact the owner.';
+        showStep('step4');
+      } catch(e) {
+        const message = document.getElementById('finalMsg');
+        message.className = 'msg error';
+        message.textContent = 'We could not confirm that your removal request was sent. Please contact the directory owner rather than sending repeated requests.';
+        showStep('step4');
+      } finally {
+        btn.disabled = false;
+      }
     });
 
     // ── Step 3: Submit update ──
@@ -766,19 +784,33 @@
         submittedAt: new Date().toISOString()
       };
 
-      try {
-        await fetch(FORM_ENDPOINT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(updateData)
-        });
+      if (!updateData.newEmail && !updateData.newName && !updateData.newOffer &&
+          !newWebsites.length && !newSocials.length && !updateData.removeItems) {
+        showMsg(errEl, 'Enter at least one change before submitting your update.');
+        return;
+      }
 
-        const hasEmailChange = document.getElementById('newEmail').value.trim();
-        document.getElementById('finalMsg').innerHTML = 'Tuned In. Tapped In. Turned On. ✦ Your update has been received and will be reflected in the directory shortly. Love yourself, love everyone else, and have fun doing it! See you soon! ✦'
-          + (hasEmailChange ? '<br><br><strong>📧 Email updated.</strong> Next time you manage your listing, search using your new email address: <strong>' + hasEmailChange + '</strong>' : '');
+      const btn = document.getElementById('updateBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sending Update...';
+
+      try {
+        await sendToSheet(updateData);
+        const message = document.getElementById('finalMsg');
+        message.className = 'msg info';
+        message.textContent = '✦ Your update request was sent. Please check the directory in a few minutes to confirm the changes appeared. If they do not, contact the directory owner before trying again; a repeated request could add the same links twice.';
+        if (updateData.newEmail) {
+          const note = document.createElement('p');
+          note.style.marginTop = '1em';
+          note.textContent = 'If your email change appears, use ' + updateData.newEmail + ' to manage this listing next time.';
+          message.appendChild(note);
+        }
         showStep('step4');
       } catch(e) {
-        showMsg(errEl, 'Something went wrong submitting your update. Please try again.');
+        showMsg(errEl, 'We could not confirm the request was sent. Check your listing before retrying, so links are not added twice.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Update';
       }
     });
 
