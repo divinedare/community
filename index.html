@@ -52,38 +52,15 @@
 
     .book-wrap {
       width: 100%;
-      max-width: 700px;
-      perspective: 1000px;
     }
 
     /* ─────────────────────────────── COVER ─── */
     #coverPage {
-      min-height: 100vh;
-      background: radial-gradient(ellipse at 30% 20%, #5A0090 0%, #2E0058 35%, #1A0033 70%, #0D001E 100%);
-      transform: perspective(1000px) rotateY(-2.5deg) rotateX(0.4deg);
-      box-shadow:
-        /* Page depth strips on right */
-        6px 0 0 #1A0030,
-        12px 2px 0 #110022,
-        18px 4px 0 #0A0016,
-        /* Elevation shadow */
-        22px 28px 50px rgba(0,0,0,0.9),
-        /* Purple ambient glow */
-        -4px 4px 35px rgba(90,0,160,0.45),
-        0 0 60px rgba(80,0,150,0.2);
+      width: 100%;
+      background: #1E003A;
       position: relative;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
-    }
-
-    /* Spine */
-    #coverPage::before {
-      content:'';
-      position: absolute;
-      left:0; top:0; bottom:0; width:18px;
-      background: linear-gradient(90deg,#06000F,#280050 70%, transparent);
-      z-index:2;
     }
 
     .cover-main {
@@ -342,7 +319,7 @@
     }
 
     /* ─────────────────────────── INNER SECTION ─── */
-    #innerSection { display: none; }
+    #innerSection { display: none; max-width: 700px; margin: 0 auto; }
 
     /* Sticky header */
     .inner-header {
@@ -739,44 +716,51 @@
     /* ── Flyer cover layout ── */
     .cover-flyer-wrap {
       position: relative;
-      display: inline-block;
-      max-width: min(90vw, 500px);
-      margin: 24px auto 0;
-      border-radius: 8px;
-      box-shadow:
-        8px 0 0 rgba(0,0,0,0.5),
-        14px 4px 0 rgba(0,0,0,0.35),
-        22px 30px 60px rgba(0,0,0,0.85),
-        -4px 4px 30px rgba(80,0,160,0.4);
-      transform: perspective(900px) rotateY(-2deg);
+      width: 100%;
+      margin: 0;
     }
 
     .cover-flyer-img {
       width: 100%;
+      height: auto;
       display: block;
-      border-radius: 8px;
     }
 
     .cover-open-wrap {
       display: flex;
       justify-content: flex-end;
-      width: 100%;
-      max-width: min(90vw, 500px);
-      margin: -8px auto 24px;
+      position: fixed;
+      right: max(16px, env(safe-area-inset-right));
+      bottom: max(16px, env(safe-area-inset-bottom));
+      z-index: 5;
     }
 
     .cover-open-btn {
-      background: rgba(0,0,0,0.6) !important;
+      background: rgba(22,0,48,0.92) !important;
       border-radius: 12px !important;
-      padding: 8px 14px 4px !important;
+      padding: 12px 22px !important;
       backdrop-filter: blur(4px) !important;
-      border: 1px solid rgba(228,102,28,0.4) !important;
+      border: 1px solid rgba(240,216,147,0.9) !important;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.5);
     }
 
     .cover-open-btn:hover {
       background: rgba(228,102,28,0.18) !important;
       border-color: rgba(228,102,28,0.65) !important;
     }
+
+    @media (max-width: 600px) {
+      #coverPage { min-height: 100svh; isolation: isolate; }
+      #coverPage::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: var(--cover-art) center / cover no-repeat;
+        filter: blur(24px) brightness(0.65);
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -875,6 +859,7 @@ let all = [], filtered = [], cur = 0;
 
 // DOM
 const coverPage    = document.getElementById('coverPage');
+coverPage.style.setProperty('--cover-art', `url("${coverPage.querySelector('.cover-flyer-img').src}")`);
 const innerSection = document.getElementById('innerSection');
 const openDirBtn   = document.getElementById('openDirBtn');
 const homeBtn      = document.getElementById('homeBtn');
@@ -896,6 +881,7 @@ const resultsCount = document.getElementById('resultsCount');
 function openDirectory(){
   coverPage.style.display='none';
   innerSection.style.display='block';
+  window.scrollTo(0, 0);
   if(!all.length) loadData();
   else renderPage();
 }
@@ -903,6 +889,7 @@ function openDirectory(){
 function goHome(){
   innerSection.style.display='none';
   coverPage.style.display='flex';
+  window.scrollTo(0, 0);
 }
 
 openDirBtn.addEventListener('click', openDirectory);
