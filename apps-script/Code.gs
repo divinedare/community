@@ -6,8 +6,9 @@ function doPost(e) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Submissions');
     if (!sheet) throw new Error('Submissions sheet was not found');
 
-    const ownerEmail = Session.getEffectiveUser().getEmail();
-    if (!ownerEmail) throw new Error('The deployment owner email is unavailable');
+    // The script runs as the sheet owner, but Session.getEffectiveUser() needs
+    // an additional OAuth scope. Use the verified notification address here.
+    const ownerEmail = 'divinedivas333@gmail.com';
 
     if (data.action === 'delete') {
       const email = String(data.email || '').trim();
