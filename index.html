@@ -455,7 +455,7 @@
       min-height: 0;
       width: 100%;
       display: grid;
-      grid-template-rows: 18% minmax(0, 1fr) 15%;
+      grid-template-rows: 15% minmax(0, 1fr) 8%;
       overflow: hidden;
       isolation: auto;
       background: #f6f2f3;
@@ -512,32 +512,54 @@
 
     .cover-center {
       min-height: 0;
-      display: grid;
-      place-items: center;
-      padding: clamp(10px, 2.2svh, 24px) 18px;
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      justify-content: center;
+      padding: clamp(8px, 1.8svh, 18px) 18px;
       color: #253257;
       text-align: center;
-      background:
-        radial-gradient(ellipse at 50% 100%, rgba(159, 172, 213, .22), transparent 62%),
-        linear-gradient(180deg, #fffdfc, #f6f1f4 74%, #e6e7f0);
+      background: linear-gradient(#fffdfc, #faf7fa 55%, #dbe4f2);
     }
 
-    .cover-content-inner { width: min(100%, 960px); }
+    /* Show only the skyline, marina and water from the original cover artwork. */
+    .cover-center::before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      inset: auto 0 0;
+      height: 57%;
+      background: url('assets/purple-pages-cityscape.jpg') center bottom / cover no-repeat;
+      mask-image: linear-gradient(transparent, #000 26%);
+      -webkit-mask-image: linear-gradient(transparent, #000 26%);
+      filter: saturate(1.28) contrast(1.12);
+    }
+
+    .cover-content-inner {
+      width: min(100%, 960px);
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      align-items: center;
+    }
+
+    .cover-intro { align-self: start; }
 
     .cover-title {
       font-family: 'Dancing Script', 'Brush Script MT', cursive;
-      font-size: clamp(3.2rem, min(7.4vw, 11svh), 6.8rem);
+      font-size: clamp(3.5rem, min(6.4vw, 11svh), 6.3rem);
       font-weight: 700;
-      line-height: .93;
-      letter-spacing: -.025em;
+      line-height: .86;
+      letter-spacing: -.035em;
       color: #27385f;
-      text-shadow: 1px 2px 0 rgba(171, 157, 179, .25);
+      -webkit-text-stroke: .4px #27385f;
+      text-shadow: 2px 3px 0 rgba(171, 157, 179, .3);
     }
 
-    .cover-title span { display: block; }
+    .cover-title span { display: inline; }
 
     .cover-directory-label {
-      margin-top: clamp(8px, 1.8svh, 18px);
+      margin-top: clamp(6px, 1.2svh, 14px);
       font-family: 'Cinzel', Georgia, serif;
       font-size: clamp(.7rem, 1.45vw, 1.22rem);
       font-weight: 700;
@@ -546,36 +568,56 @@
       color: #b65d32;
     }
 
-    .cover-ornament {
-      width: min(45%, 300px);
-      height: 1px;
-      margin: clamp(12px, 2svh, 20px) auto;
-      background: linear-gradient(90deg, transparent, #bba167, transparent);
+    .cover-description {
+      max-width: 850px;
+      margin: 0 auto;
+      padding: clamp(8px, 1.2svh, 14px) clamp(13px, 2.3vw, 26px);
+      border-radius: 13px;
+      background: rgba(255, 253, 252, .74);
+      font-size: clamp(1rem, min(1.8vw, 2.6svh), 1.33rem);
+      font-weight: 600;
+      line-height: 1.4;
+      color: #243154;
+      text-align: justify;
+      text-align-last: center;
+      hyphens: auto;
+      box-shadow: 0 4px 20px rgba(33, 44, 75, .08);
     }
 
-    .cover-description {
-      max-width: 780px;
+    .cover-bottom-content { align-self: end; }
+
+    .cover-book {
+      display: block;
+      width: clamp(78px, 9svh, 116px);
+      height: auto;
       margin: 0 auto;
-      font-size: clamp(.84rem, min(1.65vw, 2svh), 1.2rem);
-      font-weight: 500;
-      line-height: 1.55;
-      color: #283251;
-      text-wrap: pretty;
+      filter: drop-shadow(0 4px 5px rgba(23, 14, 60, .3));
+    }
+
+    .cover-book-credit {
+      display: block;
+      margin-top: 2px;
+      color: #1f2850;
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: clamp(.68rem, 1.4svh, .9rem);
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-shadow: 0 1px 5px #fff;
     }
 
     .cover-enter {
-      margin-top: clamp(14px, 3svh, 30px);
-      padding: clamp(10px, 1.35svh, 15px) clamp(20px, 3vw, 34px);
-      border: 1px solid #ab773f;
-      border-radius: 6px;
-      background: linear-gradient(135deg, #d6b76d, #b78542);
-      color: #201439;
+      margin-top: clamp(5px, 1svh, 10px);
+      padding: clamp(8px, 1svh, 12px) clamp(28px, 4vw, 45px);
+      border: 2px solid #d6b76d;
+      border-radius: 999px;
+      background: #271243;
+      color: #f0d893;
       font-family: 'Cinzel', Georgia, serif;
       font-size: clamp(.79rem, 1.35vw, 1rem);
       font-weight: 700;
       letter-spacing: .11em;
       cursor: pointer;
-      box-shadow: 0 7px 18px rgba(43, 29, 56, .19);
+      box-shadow: 0 7px 18px rgba(43, 29, 56, .24);
       transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
     }
 
@@ -588,26 +630,28 @@
     }
 
     @media (max-width: 640px) {
-      #coverPage { grid-template-rows: 16% minmax(0, 1fr) 12%; }
+      #coverPage { grid-template-rows: 13% minmax(0, 1fr) 7%; }
       .cover-sky-top { justify-content: flex-start; gap: 12px; padding: 7px 14px; }
       .cover-brand-logo { width: min(10svh, 78px); height: min(10svh, 78px); }
       .cover-brand-name { font-size: clamp(1rem, 4.2vw, 1.5rem); letter-spacing: .06em; }
-      .cover-center { padding: 8px 18px; }
-      .cover-title { font-size: clamp(2.45rem, min(10vw, 7.3svh), 4rem); }
-      .cover-directory-label { font-size: clamp(.59rem, 2.25vw, .83rem); letter-spacing: .21em; }
-      .cover-description { font-size: clamp(.75rem, min(3.25vw, 1.75svh), .92rem); line-height: 1.4; }
-      .cover-ornament { margin: 10px auto; }
-      .cover-enter { margin-top: 13px; padding: 10px 15px; font-size: .77rem; }
+      .cover-center { padding: 8px 14px; }
+      .cover-center::before { height: 53%; background-size: auto 450%; }
+      .cover-title { font-size: clamp(2.65rem, min(11.3vw, 6.8svh), 4.25rem); }
+      .cover-title span { display: block; }
+      .cover-directory-label { font-size: clamp(.64rem, 2.4vw, .87rem); letter-spacing: .19em; }
+      .cover-description { font-size: clamp(.88rem, min(3.6vw, 1.85svh), 1.05rem); line-height: 1.35; padding: 8px 10px; }
+      .cover-book { width: clamp(66px, 8.5svh, 85px); }
+      .cover-enter { padding: 8px 27px; font-size: .77rem; }
     }
 
     @media (max-height: 620px) {
-      #coverPage { grid-template-rows: 14% minmax(0, 1fr) 9%; }
+      #coverPage { grid-template-rows: 12% minmax(0, 1fr) 6%; }
       .cover-brand-logo { width: min(9svh, 65px); height: min(9svh, 65px); }
-      .cover-title { font-size: clamp(2.1rem, 7.1svh, 4rem); }
-      .cover-directory-label { margin-top: 5px; }
-      .cover-description { font-size: clamp(.72rem, 1.7svh, .92rem); line-height: 1.3; }
-      .cover-ornament { margin: 7px auto; }
-      .cover-enter { margin-top: 9px; padding: 8px 14px; }
+      .cover-title { font-size: clamp(2.25rem, 7.4svh, 4.4rem); }
+      .cover-directory-label { margin-top: 4px; }
+      .cover-description { font-size: clamp(.77rem, 1.85svh, .99rem); line-height: 1.27; padding: 6px 10px; }
+      .cover-book { width: min(9svh, 70px); }
+      .cover-enter { margin-top: 4px; padding: 6px 21px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -628,11 +672,28 @@
 
   <main class="cover-center">
     <div class="cover-content-inner">
-      <h1 class="cover-title"><span>The Real</span><span>Purple Pages</span></h1>
-      <p class="cover-directory-label">Community Directory</p>
-      <div class="cover-ornament" aria-hidden="true"></div>
+      <div class="cover-intro">
+        <h1 class="cover-title"><span>The Real</span> <span>Purple Pages</span></h1>
+        <p class="cover-directory-label">Community Directory</p>
+      </div>
       <p class="cover-description">Welcome to The Real Purple Pages Community Directory, where connection meets community. This is your space to discover, support and connect with the incredible businesses, brands, products and services created by members of our community. Take a look around, make meaningful connections and, whenever possible, support someone within the community first.</p>
-      <button class="cover-enter" id="openDirBtn" type="button">Open the Directory <span aria-hidden="true">→</span></button>
+      <div class="cover-bottom-content">
+        <svg class="cover-book" viewBox="0 0 128 96" role="img" aria-label="Purple Pages book">
+          <defs>
+            <linearGradient id="bookCover" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6846a2"/><stop offset="1" stop-color="#24103f"/></linearGradient>
+          </defs>
+          <path d="M14 19 Q33 11 61 22 L64 82 Q35 71 12 79 Z" fill="#e8dbbd" stroke="#a88e62" stroke-width="2"/>
+          <path d="M114 19 Q95 11 67 22 L64 82 Q93 71 116 79 Z" fill="#e8dbbd" stroke="#a88e62" stroke-width="2"/>
+          <path d="M7 15 Q35 5 63 20 L64 77 Q36 65 7 74 Z" fill="url(#bookCover)" stroke="#d3ac66" stroke-width="3"/>
+          <path d="M121 15 Q93 5 65 20 L64 77 Q92 65 121 74 Z" fill="url(#bookCover)" stroke="#d3ac66" stroke-width="3"/>
+          <path d="M64 20 L64 82" stroke="#e6c989" stroke-width="3"/>
+          <path d="M18 22 Q38 17 56 28 M72 28 Q91 17 110 22 M21 63 Q40 59 55 67 M73 67 Q90 59 107 63" fill="none" stroke="#d6b76d" stroke-width="2"/>
+          <text x="35" y="47" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#f5dc96">PURPLE</text>
+          <text x="94" y="47" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#f5dc96">PAGES</text>
+        </svg>
+        <span class="cover-book-credit">A Divine Dare</span>
+        <button class="cover-enter" id="openDirBtn" type="button">Open <span aria-hidden="true">→</span></button>
+      </div>
     </div>
   </main>
 
@@ -744,7 +805,7 @@ function openDirectory(){
 
 function goHome(){
   innerSection.style.display='none';
-  coverPage.style.display='flex';
+  coverPage.style.display='grid';
   window.scrollTo(0, 0);
 }
 
