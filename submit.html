@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
     :root {
       --gold: #E4661C;
@@ -756,7 +757,7 @@
         <div class="card-header"><h2>Submit</h2></div>
         <div class="card-body">
           <div class="success" id="successMessage">Tuned In. Tapped In. Turned On. ✦ You're officially part of the spotlight.</div>
-          <div class="error" id="errorMessage">Looks like something's missing — check the highlighted field(s) and try again.</div>
+          <div class="error" id="errorMessage" role="alert" tabindex="-1">Looks like something's missing — check the highlighted field(s) and try again.</div>
           <p class="muted">Once you submit, your info will be added to the community directory so fellow members can find and support you.</p>
           <div class="actions">
             <button class="primary" type="submit">Submit My Listing</button>
@@ -773,21 +774,105 @@
     const FORM_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbwYUEMDNxTwTXeDZQJsb1LWaC3pHiaNWrNiXQmUOlEbNCt5rZNf3LNxsTIEFBr774Ci/exec';
     const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSZOFYPib4sTBV8tH1EqDHWAXbdYshvorYedFZs8aF_B9AofcMM1Z7iWrgcSIjfOMEOt0Kx0oRJLgvu/pub?output=csv';
 
-    async function checkForDuplicate(name, email) {
-      try {
-        const res = await fetch(SHEET_CSV_URL);
-        const text = await res.text();
-        const lines = text.split('\n').slice(1); // skip header row
-        for (const line of lines) {
-          // Simple check: does any row contain this exact name or email
-          const lower = line.toLowerCase();
-          if (email && lower.includes(email.toLowerCase())) return 'email';
-          if (name && lower.includes('"' + name.toLowerCase() + '"')) return 'name';
-        }
-        return null;
-      } catch(e) {
-        return null; // if check fails, let them through
+    // Shared storefront domains need their shop path; personal sites match by
+    // domain, regardless of www, protocol, trailing slash, or subpage.
+    const SHARED_WEBSITE_HOSTS = new Set([
+      'etsy.com', 'amazon.com', 'stan.store', 'beacons.ai', 'gumroad.com',
+      'payhip.com', 'skool.com', 'shopify.com', 'facebook.com',
+      'instagram.com', 'tiktok.com', 'youtube.com', 'linktr.ee'
+    ]);
+
+    function websiteKey(value) {
+      const input = String(value || '').trim();
+      if (!input) return '';
+      let url;
+      try { url = new URL(/^[a-z][a-z\d+.-]*:\/\//i.test(input) ? input : 'https://' + input); }
+      catch (err) { return ''; }
+      const host = url.hostname.toLowerCase().replace(/^www\./, '').replace(/\.$/, '');
+      if (!host.includes('.') || /\s/.test(host)) return '';
+      const path = url.pathname.replace(/\/+$/, '').toLowerCase();
+      return SHARED_WEBSITE_HOSTS.has(host) ? host + path : host;
+    }
+
+    function websiteConflict(websites, rows) {
+      const seen = new Set();
+      for (const website of websites) {
+        const key = websiteKey(website.url);
+        if (!key) return { kind: 'invalidWebsite', url: website.url };
+        if (seen.has(key)) return { kind: 'websiteInForm', url: website.url };
+        seen.add(key);
       }
+      for (const row of rows) {
+        let existing;
+        try { existing = JSON.parse(row['Websites'] || '[]'); }
+        catch (err) { continue; }
+        if (!Array.isArray(existing)) continue;
+        for (const website of existing) {
+          const key = websiteKey(website?.url);
+          if (key && seen.has(key)) {
+            return { kind: 'website', url: websites.find(item => websiteKey(item.url) === key).url };
+          }
+        }
+      }
+      return null;
+    }
+
+    // Apps Script serves a read-only JSONP response so the form can check the
+    // current sheet, even before Google's published CSV refreshes.
+    function checkLiveWebsites(websites) {
+      return new Promise((resolve, reject) => {
+        const callback = '__divineWebsiteCheck_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        const script = document.createElement('script');
+        let settled = false;
+        const finish = (error, status) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          delete window[callback];
+          script.remove();
+          error ? reject(error) : resolve(status);
+        };
+        const timer = setTimeout(() => finish(new Error('Website lookup timed out')), 12000);
+        window[callback] = result => {
+          const status = result?.status;
+          if (['available', 'duplicate_website', 'invalid_website'].includes(status)) finish(null, status);
+          else finish(new Error('Website lookup unavailable'));
+        };
+        script.onerror = () => finish(new Error('Website lookup failed'));
+        script.src = FORM_ENDPOINT_URL + '?callback=' + encodeURIComponent(callback) +
+          '&websites=' + encodeURIComponent(JSON.stringify(websites.map(item => item.url))) +
+          '&check=' + Date.now();
+        document.head.appendChild(script);
+      });
+    }
+
+    async function checkForDuplicate(name, email, websites) {
+      const localConflict = websiteConflict(websites, []);
+      if (localConflict) return localConflict;
+      try {
+        const res = await fetch(SHEET_CSV_URL + '&check=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('Directory lookup failed');
+        const parsed = Papa.parse(await res.text(), { header: true, skipEmptyLines: true });
+        if (!parsed.meta.fields?.includes('Websites')) throw new Error('Directory data is incomplete');
+        for (const row of parsed.data) {
+          if (email && (row['Email'] || '').trim().toLowerCase() === email.toLowerCase()) return { kind: 'email' };
+          if (name && (row['Name'] || '').trim().toLowerCase() === name.toLowerCase()) return { kind: 'name' };
+        }
+        const publishedConflict = websiteConflict(websites, parsed.data);
+        if (publishedConflict) return publishedConflict;
+      } catch (err) {
+        // Name/email checks use the published CSV; websites also use the live sheet.
+      }
+      if (websites.length) {
+        try {
+          const status = await checkLiveWebsites(websites);
+          if (status === 'duplicate_website') return { kind: 'website' };
+          if (status === 'invalid_website') return { kind: 'invalidWebsite' };
+        } catch (err) {
+          return { kind: 'unavailable' };
+        }
+      }
+      return null;
     }
 
     const form = document.getElementById('simpleForm');
@@ -798,6 +883,18 @@
     const addWebsiteBtn = document.getElementById('addWebsiteBtn');
     const socialRows = document.getElementById('socialRows');
     const addSocialBtn = document.getElementById('addSocialBtn');
+
+    function showSubmissionError(message, websiteUrl) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      if (websiteUrl) {
+        const input = [...document.querySelectorAll('[name="websiteUrl[]"]')]
+          .find(item => item.value.trim() === websiteUrl);
+        input?.classList.add('field-error');
+      }
+      errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      errorMessage.focus({ preventScroll: true });
+    }
 
     const WEBSITE_OPTIONS = `
       <option value="">Select one</option>
@@ -1121,17 +1218,32 @@
         return;
       }
 
-      // Check for duplicate before submitting
-      errorMessage.innerHTML = 'Checking for existing listings...';
+      // Check the published directory before sending a request to Apps Script.
+      errorMessage.textContent = 'Checking for existing listings and websites...';
       errorMessage.style.display = 'block';
-      const duplicate = await checkForDuplicate(data.name, data.email);
+      errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const duplicate = await checkForDuplicate(data.name, data.email, data.websites);
       errorMessage.style.display = 'none';
 
       if (duplicate) {
-        const field = duplicate === 'email' ? 'email address' : 'name';
-        errorMessage.innerHTML = `<strong>Looks like you're already in the spotlight! ✦</strong><br>A listing with this ${field} already exists. If you need to update or add to your listing, please use the <a href="manage.html" style="color:var(--gold-light);text-decoration:underline;">Manage My Listing</a> page.`;
-        errorMessage.style.display = 'block';
-        errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (duplicate.kind === 'email' || duplicate.kind === 'name') {
+          const field = duplicate.kind === 'email' ? 'email address' : 'name';
+          showSubmissionError(`A listing with this ${field} already exists. Open`);
+          const manageLink = document.createElement('a');
+          manageLink.href = 'manage.html';
+          manageLink.textContent = 'Manage My Listing';
+          manageLink.style.cssText = 'color:var(--gold-light);text-decoration:underline;';
+          errorMessage.append(' ', manageLink, ' to update it.');
+        } else if (duplicate.kind === 'unavailable') {
+          showSubmissionError('We could not check existing websites right now. Please try again in a moment. Your listing has not been sent.');
+        } else if (duplicate.kind === 'invalidWebsite') {
+          showSubmissionError('Please enter a valid website link, such as pawfinity414.com or www.pawfinity414.com.', duplicate.url);
+        } else {
+          const message = duplicate.kind === 'websiteInForm'
+            ? 'You entered this website more than once. Please check the website links in your form.'
+            : 'This website is already listed in the directory. Please double-check the link before submitting.';
+          showSubmissionError(message, duplicate.url);
+        }
         return;
       }
 
@@ -1154,8 +1266,7 @@
         whatYouOffer.style.pointerEvents = 'auto';
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err) {
-        errorMessage.textContent = 'We could not confirm the request was sent. Check the directory before retrying, so you do not create a duplicate listing.';
-        errorMessage.style.display = 'block';
+        showSubmissionError('We could not confirm the request was sent. Check the directory before retrying, so you do not create a duplicate listing.');
       }
     });
   </script>
