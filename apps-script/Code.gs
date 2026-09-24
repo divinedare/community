@@ -47,6 +47,8 @@ function doPost(e) {
             String(row[3] || '').trim().toLowerCase() === newEmail.toLowerCase())) {
           return reply_('duplicate_email');
         }
+        const websiteIssue = websiteIssue_(data.newWebsites, rows);
+        if (websiteIssue) return reply_(websiteIssue);
 
         const rowNumber = index + 1;
         if (data.newName) sheet.getRange(rowNumber, 2).setValue(String(data.newName).trim());
@@ -75,6 +77,8 @@ function doPost(e) {
         if (rows.some((row, i) => i > 0 && String(row[3] || '').trim().toLowerCase() === email)) {
           return reply_('duplicate_email');
         }
+        const websiteIssue = websiteIssue_(data.websites, rows);
+        if (websiteIssue) return reply_(websiteIssue);
         sheet.appendRow([
           new Date(),
           data.name || '',
@@ -105,6 +109,69 @@ function doPost(e) {
     console.error('Directory submission failed: ' + err);
     return reply_('error');
   }
+}
+
+// Read-only website check used by the public forms. Return only a status, never
+// sheet rows or member information. The callback is restricted to a safe name.
+function doGet(e) {
+  const callback = String((e.parameter || {}).callback || '');
+  if (!/^[$A-Za-z_][$\w]{0,100}$/.test(callback)) {
+    return ContentService.createTextOutput('Invalid callback');
+  }
+  let status = 'unavailable';
+  try {
+    const urls = JSON.parse(e.parameter.websites || '[]');
+    if (Array.isArray(urls) && urls.length <= 20) {
+      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Submissions');
+      const rows = sheet.getDataRange().getValues();
+      status = websiteIssue_(urls.map(url => ({ url })), rows) || 'available';
+    }
+  } catch (err) {
+    console.error('Website lookup failed: ' + err);
+  }
+  return ContentService.createTextOutput(callback + '(' + JSON.stringify({ status }) + ');')
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+// Check the live sheet inside the submission lock. The published CSV can lag
+// behind new rows, so browser validation alone cannot prevent a duplicate.
+function websiteIssue_(additions, rows) {
+  if (!Array.isArray(additions) || !additions.length) return null;
+  const keys = new Set();
+  for (const website of additions) {
+    const key = websiteKey_(website && website.url);
+    if (!key) return 'invalid_website';
+    if (keys.has(key)) return 'duplicate_website';
+    keys.add(key);
+  }
+  for (let i = 1; i < rows.length; i++) {
+    let existing;
+    try { existing = JSON.parse(rows[i][5] || '[]'); }
+    catch (err) { continue; }
+    if (!Array.isArray(existing)) continue;
+    for (const website of existing) {
+      const key = websiteKey_(website && website.url);
+      if (key && keys.has(key)) return 'duplicate_website';
+    }
+  }
+  return null;
+}
+
+function websiteKey_(value) {
+  const input = String(value || '').trim()
+    .replace(/^[a-z][a-z\d+.-]*:\/\//i, '').replace(/^\/\//, '');
+  const match = input.match(/^([^/?#]+)([^?#]*)/);
+  if (!match || /\s|@/.test(match[1])) return '';
+  const host = match[1].toLowerCase().replace(/:\d+$/, '')
+    .replace(/^www\./, '').replace(/\.$/, '');
+  if (!/^[a-z\d.-]+\.[a-z\d-]+$/.test(host)) return '';
+  const path = match[2].replace(/\/+$/, '').toLowerCase();
+  const sharedHosts = [
+    'etsy.com', 'amazon.com', 'stan.store', 'beacons.ai', 'gumroad.com',
+    'payhip.com', 'skool.com', 'shopify.com', 'facebook.com',
+    'instagram.com', 'tiktok.com', 'youtube.com', 'linktr.ee'
+  ];
+  return sharedHosts.indexOf(host) >= 0 ? host + path : host;
 }
 
 function mergeLinks_(existingValue, additions, addressKey) {
