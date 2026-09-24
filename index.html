@@ -52,38 +52,35 @@
 
     .book-wrap {
       width: 100%;
-      max-width: 700px;
       perspective: 1000px;
     }
 
     /* ─────────────────────────────── COVER ─── */
     #coverPage {
       min-height: 100vh;
-      background: radial-gradient(ellipse at 30% 20%, #5A0090 0%, #2E0058 35%, #1A0033 70%, #0D001E 100%);
-      transform: perspective(1000px) rotateY(-2.5deg) rotateX(0.4deg);
-      box-shadow:
-        /* Page depth strips on right */
-        6px 0 0 #1A0030,
-        12px 2px 0 #110022,
-        18px 4px 0 #0A0016,
-        /* Elevation shadow */
-        22px 28px 50px rgba(0,0,0,0.9),
-        /* Purple ambient glow */
-        -4px 4px 35px rgba(90,0,160,0.45),
-        0 0 60px rgba(80,0,150,0.2);
+      min-height: 100svh;
+      padding: 12px 16px;
+      background: #1E003A;
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      isolation: isolate;
     }
 
-    /* Spine */
-    #coverPage::before {
-      content:'';
+    /* Fill the sides of wider screens with the cover's own colors. */
+    #coverPage::after {
+      content: '';
       position: absolute;
-      left:0; top:0; bottom:0; width:18px;
-      background: linear-gradient(90deg,#06000F,#280050 70%, transparent);
-      z-index:2;
+      inset: -40px;
+      background: var(--cover-art) center / cover no-repeat;
+      filter: blur(32px) brightness(0.62);
+      opacity: 0.85;
+      pointer-events: none;
+      z-index: -1;
     }
 
     .cover-main {
@@ -342,7 +339,7 @@
     }
 
     /* ─────────────────────────── INNER SECTION ─── */
-    #innerSection { display: none; }
+    #innerSection { display: none; max-width: 700px; margin: 0 auto; }
 
     /* Sticky header */
     .inner-header {
@@ -739,9 +736,8 @@
     /* ── Flyer cover layout ── */
     .cover-flyer-wrap {
       position: relative;
-      display: inline-block;
-      max-width: min(90vw, 500px);
-      margin: 24px auto 0;
+      width: min(100%, calc((100svh - 88px) * 7 / 9), 830px);
+      margin: 0;
       border-radius: 8px;
       box-shadow:
         8px 0 0 rgba(0,0,0,0.5),
@@ -753,6 +749,7 @@
 
     .cover-flyer-img {
       width: 100%;
+      height: auto;
       display: block;
       border-radius: 8px;
     }
@@ -760,9 +757,8 @@
     .cover-open-wrap {
       display: flex;
       justify-content: flex-end;
-      width: 100%;
-      max-width: min(90vw, 500px);
-      margin: -8px auto 24px;
+      width: min(100%, calc((100svh - 88px) * 7 / 9), 830px);
+      margin: 0;
     }
 
     .cover-open-btn {
@@ -776,6 +772,14 @@
     .cover-open-btn:hover {
       background: rgba(228,102,28,0.18) !important;
       border-color: rgba(228,102,28,0.65) !important;
+    }
+
+    @media (max-width: 480px) {
+      #coverPage { padding: 8px; gap: 10px; }
+      .cover-flyer-wrap, .cover-open-wrap {
+        width: min(100%, calc((100svh - 72px) * 7 / 9));
+      }
+      .cover-flyer-wrap { transform: none; }
     }
   </style>
 </head>
@@ -875,6 +879,7 @@ let all = [], filtered = [], cur = 0;
 
 // DOM
 const coverPage    = document.getElementById('coverPage');
+coverPage.style.setProperty('--cover-art', `url("${coverPage.querySelector('.cover-flyer-img').src}")`);
 const innerSection = document.getElementById('innerSection');
 const openDirBtn   = document.getElementById('openDirBtn');
 const homeBtn      = document.getElementById('homeBtn');
